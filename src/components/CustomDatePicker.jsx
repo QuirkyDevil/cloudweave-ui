@@ -145,7 +145,7 @@ const CustomDatePicker = ({ onDateRangeSelect }) => {
 
   return (
     <div className="w-80">
-      <div className="w-full bg-neutral-800 rounded-2xl p-4">
+      <div className="w-full bg-neutral-900 rounded-2xl p-4">
         {/* Date Range Display */}
         <div className="flex justify-between mb-4 text-white">
           <div className="text-sm">

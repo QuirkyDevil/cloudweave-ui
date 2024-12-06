@@ -28,7 +28,7 @@ const SidePanel = ({
         className="fixed right-0 top-[100px] transform -translate-y-1/2 rotate-90 origin-top-right
   bg-neutral-900 text-white p-2 rounded-b-lg
   shadow-lg flex items-center space-x-2 z-50
-  hover:bg-neutral-800 transition-colors"
+  hover:bg-neutral-00 transition-colors"
       >
         <Info size={20} />
         <span className="font-medium">Info</span>

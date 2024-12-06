@@ -12,7 +12,12 @@ import {
   getModelTechnique,
 } from '@/lib/data';
 
-export default function Navbar({ className, onItemSelect }) {
+export default function Navbar({
+  className,
+  onItemSelect,
+  toggleMapMode,
+  isDynamic,
+}) {
   const [active, setActive] = useState(null);
 
   const menuItems = [
@@ -41,6 +46,18 @@ export default function Navbar({ className, onItemSelect }) {
       item: 'Time',
       options: null,
       onSelect: null,
+    },
+    {
+      item: 'Map Mode',
+      options: ['Static Map', 'Dynamic Map'],
+      onSelect: (option) => {
+        if (
+          (option === 'Static Map' && isDynamic) ||
+          (option === 'Dynamic Map' && !isDynamic)
+        ) {
+          toggleMapMode(!isDynamic);
+        }
+      },
     },
   ];
 
@@ -75,7 +92,7 @@ export default function Navbar({ className, onItemSelect }) {
               />
             ) : (
               menu.options && (
-                <div className="text-sm flex flex-col space-y-2">
+                <div className="text-m flex flex-col space-y-4 px-4 bg-neutral-900">
                   {menu.options.map((option) => (
                     <HoveredLink
                       key={option}

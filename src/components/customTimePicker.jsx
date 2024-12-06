@@ -92,7 +92,7 @@ const CustomTimePicker = ({ onTimeRangeSelect }) => {
 
   return (
     <div className="w-80">
-      <div className="w-full bg-neutral-800 rounded-2xl p-4">
+      <div className="w-full bg-neutral-900 rounded-2xl p-4">
         {/* Time Range Display */}
         <div className="flex justify-between mb-4 text-white">
           <div className="text-sm">
@@ -121,7 +121,7 @@ const CustomTimePicker = ({ onTimeRangeSelect }) => {
         {/* Time Selection Buttons */}
         <div className="flex space-x-2">
           {/* Hours Column */}
-          <div className="w-1/2 max-h-48 overflow-y-auto bg-neutral-700 rounded-lg">
+          <div className="w-1/2 max-h-48 overflow-y-auto bg-neutral-900 rounded-lg">
             <div className="text-center text-white/60 text-xs py-1">
               {selectionStage.includes('start') ? 'Start Hours' : 'End Hours'}
             </div>
@@ -153,7 +153,7 @@ const CustomTimePicker = ({ onTimeRangeSelect }) => {
           </div>
 
           {/* Minutes Column */}
-          <div className="w-1/2 max-h-48 overflow-y-auto bg-neutral-700 rounded-lg">
+          <div className="w-1/2 max-h-48 overflow-y-auto bg-neutral-900 rounded-lg">
             <div className="text-center text-white/60 text-xs py-1">
               {selectionStage.includes('start')
                 ? 'Start Minutes'
@@ -186,7 +186,7 @@ const CustomTimePicker = ({ onTimeRangeSelect }) => {
         {(startTime.hour !== null || endTime.hour !== null) && (
           <button
             onClick={resetSelection}
-            className="w-full mt-4 text-white/70 hover:text-white bg-neutral-700 py-2 rounded-lg"
+            className="w-full mt-4 text-white/70 hover:text-white bg-neutral-900 py-2 rounded-lg"
           >
             Reset
           </button>
