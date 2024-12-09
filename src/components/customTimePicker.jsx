@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const CustomTimePicker = ({ onTimeRangeSelect }) => {
+const CustomTimePicker = ({ onTimeRangeSelect, className }) => {
   const [startTime, setStartTime] = useState({ hour: null, minute: null });
   const [endTime, setEndTime] = useState({ hour: null, minute: null });
   const [selectionStage, setSelectionStage] = useState('start-hour');
@@ -75,7 +75,7 @@ const CustomTimePicker = ({ onTimeRangeSelect }) => {
   // Determine button style based on selection stage
   const getButtonStyle = (type, value) => {
     // Base styles
-    const baseStyle = 'text-center text-white py-1 cursor-pointer';
+    const baseStyle = 'text-center text-xs text-white py-0.5 cursor-pointer';
     const hoverStyle = 'hover:bg-neutral-600';
     const selectedStyle = 'bg-red-900/30';
 
@@ -91,17 +91,17 @@ const CustomTimePicker = ({ onTimeRangeSelect }) => {
   };
 
   return (
-    <div className="w-80">
-      <div className="w-full bg-neutral-900 rounded-2xl p-4">
+    <div className={`w-full ${className}`}>
+      <div className="w-full bg-neutral-900 rounded-2xl p-2">
         {/* Time Range Display */}
-        <div className="flex justify-between mb-4 text-white">
-          <div className="text-sm">
+        <div className="flex justify-between mb-2 text-white">
+          <div className="text-xs">
             Start:{' '}
             {startTime.hour !== null && startTime.minute !== null
               ? formatTime(startTime.hour, startTime.minute)
               : 'Start Time'}
           </div>
-          <div className="text-sm">
+          <div className="text-xs">
             End:{' '}
             {endTime.hour !== null && endTime.minute !== null
               ? formatTime(endTime.hour, endTime.minute)
@@ -110,7 +110,7 @@ const CustomTimePicker = ({ onTimeRangeSelect }) => {
         </div>
 
         {/* Selection Instructions */}
-        <div className="text-white/60 text-xs mb-4 text-center">
+        <div className="text-white/60 text-[0.6rem] mb-2 text-center">
           {selectionStage === 'start-hour' && 'Select start hour'}
           {selectionStage === 'start-minute' && 'Select start minute'}
           {selectionStage === 'end-hour' && 'Select end hour'}
@@ -119,10 +119,10 @@ const CustomTimePicker = ({ onTimeRangeSelect }) => {
         </div>
 
         {/* Time Selection Buttons */}
-        <div className="flex space-x-2">
+        <div className="flex space-x-1">
           {/* Hours Column */}
-          <div className="w-1/2 max-h-48 overflow-y-auto bg-neutral-900 rounded-lg">
-            <div className="text-center text-white/60 text-xs py-1">
+          <div className="w-1/2 max-h-36 overflow-y-auto bg-neutral-900 rounded-lg">
+            <div className="text-center text-white/60 text-[0.6rem] py-0.5">
               {selectionStage.includes('start') ? 'Start Hours' : 'End Hours'}
             </div>
             {(selectionStage.includes('start')
@@ -153,8 +153,8 @@ const CustomTimePicker = ({ onTimeRangeSelect }) => {
           </div>
 
           {/* Minutes Column */}
-          <div className="w-1/2 max-h-48 overflow-y-auto bg-neutral-900 rounded-lg">
-            <div className="text-center text-white/60 text-xs py-1">
+          <div className="w-1/2 max-h-36 overflow-y-auto bg-neutral-900 rounded-lg">
+            <div className="text-center text-white/60 text-[0.6rem] py-0.5">
               {selectionStage.includes('start')
                 ? 'Start Minutes'
                 : 'End Minutes'}
@@ -186,7 +186,7 @@ const CustomTimePicker = ({ onTimeRangeSelect }) => {
         {(startTime.hour !== null || endTime.hour !== null) && (
           <button
             onClick={resetSelection}
-            className="w-full mt-4 text-white/70 hover:text-white bg-neutral-900 py-2 rounded-lg"
+            className="w-full mt-2 text-white/70 hover:text-white bg-neutral-900 py-1 rounded-lg text-xs"
           >
             Reset
           </button>

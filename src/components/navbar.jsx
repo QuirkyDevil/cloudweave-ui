@@ -1,7 +1,6 @@
-'use client';
-
 import React, { useState } from 'react';
-import { HoveredLink, Menu, MenuItem } from './ui/navbar-menu';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Settings, ChevronDown, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import CustomDatePicker from './CustomDatePicker';
 import CustomTimePicker from './CustomTimePicker';
@@ -18,7 +17,10 @@ export default function Navbar({
   toggleMapMode,
   isDynamic,
 }) {
-  const [active, setActive] = useState(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedTimeRange, setSelectedTimeRange] = useState(null);
+  const [expandedItems, setExpandedItems] = useState({});
 
   const menuItems = [
     {
@@ -28,8 +30,8 @@ export default function Navbar({
         onItemSelect({
           name: option,
           details: {
-            'Published By': getModelPublisher(option),
-            'Year Published': getModelYear(option),
+            'Published By': getModelPublisher('RAFT'),
+            'Year Published': getModelYear('RAFT'),
           },
           specifications: {
             Architecture: getModelArchitecture(option),
@@ -39,13 +41,19 @@ export default function Navbar({
     },
     {
       item: 'Date',
-      options: null,
-      onSelect: null,
+      component: CustomDatePicker,
+      onSelect: (startDate, endDate) => {
+        setSelectedDate({ start: startDate, end: endDate });
+        console.log('Selected Date Range:', startDate, endDate);
+      },
     },
     {
       item: 'Time',
-      options: null,
-      onSelect: null,
+      component: CustomTimePicker,
+      onSelect: (startTime, endTime) => {
+        setSelectedTimeRange({ start: startTime, end: endTime });
+        console.log('Selected Time Range:', startTime, endTime);
+      },
     },
     {
       item: 'Map Mode',
@@ -61,53 +69,142 @@ export default function Navbar({
     },
   ];
 
+  const menuVariants = {
+    hidden: {
+      opacity: 0,
+      y: -20,
+      transition: {
+        duration: 0.3,
+      },
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.3,
+        delayChildren: 0.2,
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, x: -20 },
+    visible: { opacity: 1, x: 0 },
+  };
+
+  const toggleItemExpansion = (itemName) => {
+    setExpandedItems((prev) => ({
+      ...prev,
+      [itemName]: !prev[itemName],
+    }));
+  };
+
+  const renderSubmenuContent = (item) => {
+    // For items with options (like Model and Map Mode)
+    if (item.options && item.options.length > 0) {
+      return (
+        <motion.div
+          className="text-sm flex flex-col space-y-2 px-4 py-2 bg-neutral-800 text-white"
+          variants={menuVariants}
+        >
+          {item.options.map((option) => (
+            <motion.div
+              key={option}
+              variants={itemVariants}
+              className="cursor-pointer p-2 hover:bg-neutral-700 rounded transition-colors text-white"
+              onClick={() => {
+                item.onSelect?.(option);
+                setIsMenuOpen(false);
+              }}
+            >
+              <span className="text-white font-medium hover:text-blue-300 transition">
+                {option}
+              </span>
+            </motion.div>
+          ))}
+        </motion.div>
+      );
+    }
+
+    // For Date and Time pickers
+    if (item.component) {
+      const Component = item.component;
+      return (
+        <div className="p-2 w-full">
+          <Component
+            onDateRangeSelect={item.onSelect}
+            onTimeRangeSelect={item.onSelect}
+            className="w-full"
+          />
+        </div>
+      );
+    }
+
+    return null;
+  };
+
   return (
     <div
       className={cn(
-        'fixed top-2 left-2 z-50 bg-neutral-900 pl-4 shadow-lg rounded-2xl flex items-center space-x-6',
+        'fixed top-2 left-2 z-50 bg-neutral-900 rounded-2xl shadow-lg w-64 max-h-[calc(100vh-2rem)] flex flex-col',
         className
       )}
     >
-      <span className="font-bold text-xl text-white">CloudWeave</span>
+      <div className="flex items-center justify-between p-4 flex-shrink-0">
+        <span className="font-bold text-xl text-white">CloudWeave</span>
+        <motion.button
+          whileHover={{ rotate: 90 }}
+          whileTap={{ scale: 0.9 }}
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          className="text-white hover:text-gray-300"
+        >
+          <Settings size={24} />
+        </motion.button>
+      </div>
 
-      <Menu setActive={setActive}>
-        {menuItems.map((menu, index) => (
-          <MenuItem
-            key={index}
-            setActive={setActive}
-            active={active}
-            item={menu.item}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            variants={menuVariants}
+            className="bg-neutral-900 rounded-b-2xl overflow-y-auto flex-grow"
           >
-            {menu.item === 'Date' ? (
-              <CustomDatePicker
-                onDateRangeSelect={(start, end) => {
-                  console.log('Selected Date Range:', start, end);
-                }}
-              />
-            ) : menu.item === 'Time' ? (
-              <CustomTimePicker
-                onTimeRangeSelect={(start, end) => {
-                  console.log('Selected Time Range:', start, end);
-                }}
-              />
-            ) : (
-              menu.options && (
-                <div className="text-m flex flex-col space-y-4 px-4 bg-neutral-900">
-                  {menu.options.map((option) => (
-                    <HoveredLink
-                      key={option}
-                      onClick={() => menu.onSelect?.(option)}
-                      className="hover:text-white/80 cursor-pointer"
-                    >
-                      {option}
-                    </HoveredLink>
-                  ))}
+            {menuItems.map((menu, index) => (
+              <motion.div
+                key={index}
+                variants={itemVariants}
+                className="border-t border-white/10"
+              >
+                <div
+                  className="flex justify-between items-center p-4 text-white cursor-pointer hover:bg-neutral-800 transition-colors"
+                  onClick={() => toggleItemExpansion(menu.item)}
+                >
+                  <span className="font-semibold">{menu.item}</span>
+                  {expandedItems[menu.item] ? (
+                    <ChevronDown size={16} className="text-white" />
+                  ) : (
+                    <ChevronRight size={16} className="text-white" />
+                  )}
                 </div>
-              )
-            )}
-          </MenuItem>
-        ))}
-      </Menu>
+
+                <div
+                  className={cn(
+                    'relative transition-all duration-300 ease-in-out overflow-hidden',
+                    expandedItems[menu.item]
+                      ? 'max-h-96 opacity-100 visible z-10'
+                      : 'max-h-0 opacity-0 invisible -z-10'
+                  )}
+                >
+                  {renderSubmenuContent(menu)}
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

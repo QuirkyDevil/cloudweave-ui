@@ -64,7 +64,7 @@ export default function Map() {
           attributionControl={false}
         >
           {/* Base map layer */}
-          <TileLayer url="https://maps.aerisapi.com/amwm4D5Qu8eYpCnMbDyQZ_txBqhl3kfvc55xgSU9NDJ52YTjyPMMwDvDqpCW6u/blue-marble,water-depth,radar,states,satellite-geocolor/{z}/{x}/{y}/current.png" />
+          <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" />
 
           {/* Cloud Layers */}
           {isDynamic && cloudFrames.length > 0 && (
@@ -76,8 +76,8 @@ export default function Map() {
           )}
           {!isDynamic && cloudFrames.length > 0 && (
             <TileLayer
-              url={`${host}${cloudFrames[0]}/256/{z}/{x}/{y}/0/0_0.png`}
-              opacity={0.5}
+              url={`${host}${cloudFrames[0]}/512/{z}/{x}/{y}/0/1_0.png`}
+              opacity={0.7}
             />
           )}
         </MapContainer>
@@ -87,6 +87,7 @@ export default function Map() {
         toggleMapMode={toggleMapMode}
         isDynamic={isDynamic}
       />
+
       {/* Side Panel */}
       <SidePanel
         isOpen={isSidePanelOpen}

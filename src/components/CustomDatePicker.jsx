@@ -1,20 +1,16 @@
 import React, { useState, useEffect } from 'react';
 
-const CustomDatePicker = ({ onDateRangeSelect }) => {
+const CustomDatePicker = ({ onDateRangeSelect, className }) => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
-  // Get today's date at midnight for accurate comparison
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-
-  // Generate days for a given month and year
   const getDaysInMonth = (year, month) => {
     return new Date(year, month + 1, 0).getDate();
   };
 
-  // Generate calendar grid
   const generateCalendarDays = () => {
     const year = currentMonth.getFullYear();
     const month = currentMonth.getMonth();
@@ -23,12 +19,10 @@ const CustomDatePicker = ({ onDateRangeSelect }) => {
 
     const days = [];
 
-    // Add empty cells for days before the first day of the month
     for (let i = 0; i < firstDay; i++) {
       days.push(null);
     }
 
-    // Add days of the month
     for (let day = 1; day <= daysInMonth; day++) {
       days.push(new Date(year, month, day));
     }
@@ -36,21 +30,17 @@ const CustomDatePicker = ({ onDateRangeSelect }) => {
     return days;
   };
 
-  // Check if a date is valid for selection
   const isValidDate = (date) => {
     if (!date) return false;
-    // Disable future dates and today's date
     return date < today;
   };
 
-  // Check if a date is within the selected range
   const isDateInRange = (date) => {
     if (!startDate || !date) return false;
     if (!endDate) return date.toDateString() === startDate.toDateString();
     return date >= startDate && date <= endDate;
   };
 
-  // Determine the style for a specific date
   const getDateStyle = (date) => {
     if (!date) return '';
 
@@ -62,30 +52,24 @@ const CustomDatePicker = ({ onDateRangeSelect }) => {
     const isInRange = isDateInRange(date);
     const isInvalid = !isValidDate(date);
 
-    let className = 'text-center text-sm p-1 rounded-full relative';
+    let className = 'text-center text-xs p-0.5 rounded-full relative';
 
-    // Invalid date styling
     if (isInvalid) {
       className += ' text-neutral-600 cursor-not-allowed opacity-50';
       return className;
     }
-
-    // Cursor style
     className += ' cursor-pointer';
 
-    // Weekend styling
     if (isWeekend) {
       className += ' text-red-400';
     } else {
       className += ' text-white';
     }
 
-    // Range and selection styling
     if (isInRange) {
       className += ' bg-red-900/30';
     }
 
-    // Selected date styling
     if (isSelected || isEndDate) {
       className += ' bg-red-600 text-white';
     }
@@ -93,38 +77,32 @@ const CustomDatePicker = ({ onDateRangeSelect }) => {
     return className;
   };
 
-  // Handle date selection
+  // Rest of the implementation remains the same as previous component...
   const selectDate = (date) => {
-    // Prevent selection of invalid dates
     if (!isValidDate(date)) return;
 
     if (!startDate) {
       setStartDate(date);
     } else if (!endDate) {
-      // Ensure end date is after start date and before today
       if (date >= startDate && date < today) {
         setEndDate(date);
         onDateRangeSelect?.(startDate, date);
       } else {
-        // If selected date is before start date, reset selection
         setStartDate(date);
         setEndDate(null);
       }
     } else {
-      // Reset selection if both dates are already selected
       setStartDate(date);
       setEndDate(null);
     }
   };
 
-  // Change month
   const changeMonth = (delta) => {
     const newDate = new Date(currentMonth);
     newDate.setMonth(newDate.getMonth() + delta);
     setCurrentMonth(newDate);
   };
 
-  // Format date for display
   const formatDate = (date) => {
     return date
       ? date.toLocaleDateString('en-US', {
@@ -135,7 +113,6 @@ const CustomDatePicker = ({ onDateRangeSelect }) => {
       : 'Select Date';
   };
 
-  // Month and year display
   const monthYearDisplay = currentMonth.toLocaleDateString('en-US', {
     month: 'long',
     year: 'numeric',
@@ -144,37 +121,39 @@ const CustomDatePicker = ({ onDateRangeSelect }) => {
   const calendarDays = generateCalendarDays();
 
   return (
-    <div className="w-80">
-      <div className="w-full bg-neutral-900 rounded-2xl p-4">
+    <div className={`w-full ${className}`}>
+      <div className="w-full bg-neutral-900 rounded-2xl p-2">
         {/* Date Range Display */}
-        <div className="flex justify-between mb-4 text-white">
-          <div className="text-sm">
+        <div className="flex justify-between mb-2 text-white">
+          <div className="text-xs">
             Start: {startDate ? formatDate(startDate) : 'Start Date'}
           </div>
-          <div className="text-sm">
+          <div className="text-xs">
             End: {endDate ? formatDate(endDate) : 'End Date'}
           </div>
         </div>
 
         {/* Month Navigation */}
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-center mb-2">
           <button
             onClick={() => changeMonth(-1)}
-            className="text-white/70 hover:text-white"
+            className="text-white/70 hover:text-white text-xs"
           >
             ←
           </button>
-          <span className="text-white font-semibold">{monthYearDisplay}</span>
+          <span className="text-white text-sm font-semibold">
+            {monthYearDisplay}
+          </span>
           <button
             onClick={() => changeMonth(1)}
-            className="text-white/70 hover:text-white"
+            className="text-white/70 hover:text-white text-xs"
           >
             →
           </button>
         </div>
 
         {/* Weekday Headers */}
-        <div className="grid grid-cols-7 text-center text-xs text-white/60 mb-2">
+        <div className="grid grid-cols-7 text-center text-[0.6rem] text-white/60 mb-1">
           {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
             <div
               key={day}
@@ -186,7 +165,7 @@ const CustomDatePicker = ({ onDateRangeSelect }) => {
         </div>
 
         {/* Calendar Grid */}
-        <div className="grid grid-cols-7 gap-1">
+        <div className="grid grid-cols-7 gap-0.5">
           {calendarDays.map((date, index) => (
             <div
               key={index}

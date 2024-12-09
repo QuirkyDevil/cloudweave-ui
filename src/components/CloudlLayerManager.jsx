@@ -1,4 +1,3 @@
-
 'use client';
 import { useMap } from 'react-leaflet';
 import { useEffect, useState, useCallback, useRef } from 'react';
@@ -26,7 +25,7 @@ const CloudLayerManager = ({ frames, host, timestamps }) => {
     return cachedUrl;
   };
 
-  // Custom tile layer with caching
+  // Create a new cloud layer for a given frame
   const createCloudLayer = useCallback(
     (framePath) => {
       return L.tileLayer(`${host}${framePath}/256/{z}/{x}/{y}/0/0_0.png`, {
@@ -34,15 +33,7 @@ const CloudLayerManager = ({ frames, host, timestamps }) => {
         zIndex: 500,
         attribution: 'Cloud Cover',
         crossOrigin: true,
-        updateWhenIdle: true,
-        updateWhenZooming: false,
-        keepBuffer: 2,
         tileSize: 256,
-        // Intercept tile creation to use caching
-        tileLoadFunction: async (tile, src) => {
-          const cachedSrc = await getCachedTileUrl(src);
-          tile.src = cachedSrc;
-        },
       });
     },
     [host]
@@ -63,31 +54,31 @@ const CloudLayerManager = ({ frames, host, timestamps }) => {
     }
 
     // Transition effect
-    let opacity = 0;
+    let opacity = 0.1;
     const step = 0.1; // Adjust for smoother or faster transitions
     const interval = setInterval(() => {
       opacity += step;
-      currentLayer.setOpacity(0.5 - opacity);
+      currentLayer.setOpacity(0.7 - opacity);
       nextLayer.setOpacity(opacity);
 
-      if (opacity >= 0.5) {
+      if (opacity >= 0.7) {
         clearInterval(interval);
         map.removeLayer(currentLayer); // Remove the old layer after transition
       }
     }, 50); // Adjust interval time as needed
 
     currentIndexRef.current = nextIndex;
-  }, [cloudLayers, frames.length, map]);
+  }, [cloudLayers, map, frames.length]);
 
-  // Layer initialization and management
+  // Initialize cloud layers and set the first frame visible
   useEffect(() => {
-    if (frames.length === 0) return;
+    if (!frames.length) return;
 
     const newLayers = frames.map(createCloudLayer);
     setCloudLayers(newLayers);
 
     const initialLayer = newLayers[0];
-    initialLayer.setOpacity(1); // Ensure initial layer is visible
+    initialLayer.setOpacity(0.7); // Make the first layer visible
     initialLayer.addTo(map);
 
     return () => {
@@ -99,11 +90,11 @@ const CloudLayerManager = ({ frames, host, timestamps }) => {
     };
   }, [frames, map, createCloudLayer]);
 
-  // Frame transition loop
+  // Start frame switching
   useEffect(() => {
     if (frames.length <= 1) return;
 
-    const transitionInterval = setInterval(switchFrame, 100); // Adjust duration as needed
+    const transitionInterval = setInterval(switchFrame, 300); // Adjust timing for animation speed
     return () => clearInterval(transitionInterval);
   }, [frames, switchFrame]);
 
