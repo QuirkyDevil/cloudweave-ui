@@ -1,15 +1,26 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Settings,
-  ChevronDown,
-  ChevronRight,
-  Calendar,
-  Clock,
+  Calendar as CalendarIcon,
+  MapPin,
+  Boxes,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import CustomDatePicker from './CustomDatePicker';
-import CustomTimePicker from './CustomTimePicker';
 import {
   getModelPublisher,
   getModelYear,
@@ -23,253 +34,214 @@ export default function Navbar({
   toggleMapMode,
   isDynamic,
 }) {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [selectedModel, setSelectedModel] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTimeRange, setSelectedTimeRange] = useState(null);
-  const [selectedModel, setSelectedModel] = useState(null);
   const [selectedMapMode, setSelectedMapMode] = useState('Static Map');
-  const [expandedItems, setExpandedItems] = useState({});
+  const [selectedMapType, setSelectedMapType] = useState('Tile');
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const [locationMode, setLocationMode] = useState('gps');
 
-  const menuItems = [
-    {
-      item: 'Model',
-      options: ['DAIN', 'FILM', 'RIFE', 'RAFT'],
-      onSelect: (option) => {
-        const modelDetails = {
-          name: option,
-          details: {
-            'Published By': getModelPublisher(option),
-            'Year Published': getModelYear(option),
-          },
-          specifications: {
-            Architecture: getModelArchitecture(option),
-            'Primary Technique': getModelTechnique(option),
-          },
-        };
-        setSelectedModel(modelDetails);
-        onItemSelect(modelDetails);
-      },
-    },
-    {
-      item: 'Date',
-      component: CustomDatePicker,
-      onSelect: (startDate, endDate) => {
-        const dateRange = { start: startDate, end: endDate };
-        setSelectedDate(dateRange);
-        console.log('Selected Date Range:', startDate, endDate);
-      },
-    },
-    {
-      item: 'Time',
-      component: CustomTimePicker,
-      onSelect: (startTime, endTime) => {
-        const timeRange = { start: startTime, end: endTime };
-        setSelectedTimeRange(timeRange);
-        console.log('Selected Time Range:', startTime, endTime);
-      },
-    },
-    {
-      item: 'Map Mode',
-      options: ['Static Map', 'Dynamic Map'],
-      onSelect: (option) => {
-        setSelectedMapMode(option);
-        if (
-          (option === 'Static Map' && isDynamic) ||
-          (option === 'Dynamic Map' && !isDynamic)
-        ) {
-          toggleMapMode(!isDynamic);
-        }
-      },
-    },
-  ];
+  const models = ['DAIN', 'FILM', 'RIFE', 'RAFT'];
+  const mapModes = ['Static Map', 'Dynamic Map'];
+  const mapTypes = ['Tile', 'Satellite'];
 
-  const menuVariants = {
-    hidden: {
-      opacity: 0,
-      y: -20,
-      transition: {
-        duration: 0.3,
+  const handleModelSelect = (model) => {
+    const modelDetails = {
+      name: model,
+      details: {
+        'Published By': getModelPublisher(model),
+        'Year Published': getModelYear(model),
       },
-    },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.3,
-        delayChildren: 0.2,
-        staggerChildren: 0.1,
+      specifications: {
+        Architecture: getModelArchitecture(model),
+        'Primary Technique': getModelTechnique(model),
       },
-    },
+    };
+    setSelectedModel(modelDetails);
+    onItemSelect(modelDetails);
   };
 
-  const itemVariants = {
-    hidden: { opacity: 0, x: -20 },
-    visible: { opacity: 1, x: 0 },
-  };
-
-  const toggleItemExpansion = (itemName) => {
-    setExpandedItems((prev) => ({
-      ...prev,
-      [itemName]: !prev[itemName],
-    }));
-  };
-
-  const renderSubmenuContent = (item) => {
-    // For items with options (like Model and Map Mode)
-    if (item.options && item.options.length > 0) {
-      return (
-        <motion.div
-          className="text-sm flex flex-col space-y-2 px-4 py-2 bg-[#1E293B] text-white"
-          variants={menuVariants}
-        >
-          {item.options.map((option) => (
-            <motion.div
-              key={option}
-              variants={itemVariants}
-              className="cursor-pointer p-2 hover:bg-[#020617] rounded transition-colors text-white"
-              onClick={() => {
-                item.onSelect?.(option);
-                setIsMenuOpen(false);
-              }}
-            >
-              <span className="text-white font-medium hover:text-blue-300 transition">
-                {option}
-              </span>
-            </motion.div>
-          ))}
-        </motion.div>
-      );
+  const handleMapModeChange = (mode) => {
+    setSelectedMapMode(mode);
+    if (
+      (mode === 'Static Map' && isDynamic) ||
+      (mode === 'Dynamic Map' && !isDynamic)
+    ) {
+      toggleMapMode(!isDynamic);
     }
-
-    // For Date and Time pickers
-    if (item.component) {
-      const Component = item.component;
-      return (
-        <div className="p-2 w-full">
-          <Component
-            onDateRangeSelect={item.onSelect}
-            onTimeRangeSelect={item.onSelect}
-            className="w-full"
-          />
-        </div>
-      );
-    }
-
-    return null;
-  };
-
-  // Render selected items summary
-  const renderSelectionSummary = () => {
-    return (
-      <div className="px-4 py-2 bg-[#020617] space-y-1">
-        {selectedModel && (
-          <div className="flex items-center text-xs text-white">
-            <span className="mr-2">Model:</span>
-            <span className="font-semibold">{selectedModel.name}</span>
-          </div>
-        )}
-        {selectedDate && (
-          <div className="flex items-center text-xs text-white">
-            <Calendar size={12} className="mr-2" />
-            <span>
-              {selectedDate.start
-                ? selectedDate.start.toLocaleDateString()
-                : 'Start'}{' '}
-              -{' '}
-              {selectedDate.end ? selectedDate.end.toLocaleDateString() : 'End'}
-            </span>
-          </div>
-        )}
-        {selectedTimeRange && (
-          <div className="flex items-center text-xs text-white">
-            <Clock size={12} className="mr-2" />
-            <span>
-              {selectedTimeRange.start || 'Start'} -{' '}
-              {selectedTimeRange.end || 'End'}
-            </span>
-          </div>
-        )}
-        {selectedMapMode && (
-          <div className="flex items-center text-xs text-white">
-            <span className="mr-2">Map Mode:</span>
-            <span>{selectedMapMode}</span>
-          </div>
-        )}
-      </div>
-    );
   };
 
   return (
     <div
       className={cn(
-        'fixed top-2 left-2 z-50 bg-[#1E293B] rounded-2xl shadow-lg w-64 max-h-[calc(100vh-2rem)] flex flex-col',
+        'fixed top-2 left-2 z-50 bg-white border rounded-2xl shadow-lg w-72',
         className
       )}
     >
-      <div className="flex items-center justify-between p-4 flex-shrink-0">
-        <span className="font-bold text-xl text-white">CloudWeave</span>
-        <motion.button
-          whileHover={{ rotate: 90 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="text-white hover:text-gray-300"
+      <div className="flex items-center justify-between p-4">
+        <span className="font-bold text-xl">CloudWeave</span>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setIsPopoverOpen(!isPopoverOpen)}
         >
           <Settings size={24} />
-        </motion.button>
+        </Button>
       </div>
 
-      <AnimatePresence>
-        {isMenuOpen && (
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            exit="hidden"
-            variants={menuVariants}
-            className="bg-[#1E293B] rounded-b-2xl overflow-y-auto flex-grow"
-          >
-            {menuItems.map((menu, index) => (
-              <motion.div
-                key={index}
-                variants={itemVariants}
-                className="border-t border-white/10"
-              >
-                <div
-                  className="flex justify-between items-center p-4 text-white cursor-pointer hover:bg-[#020617] transition-colors"
-                  onClick={() => toggleItemExpansion(menu.item)}
-                >
-                  <span className="font-semibold">{menu.item}</span>
-                  {expandedItems[menu.item] ? (
-                    <ChevronDown size={16} className="text-white" />
-                  ) : (
-                    <ChevronRight size={16} className="text-white" />
-                  )}
-                </div>
+      {isPopoverOpen && (
+        <div className="space-y-4 p-4">
+          {/* Model Select */}
+          <div>
+            <p className="text-sm font-medium mb-2">Model</p>
+            <Select onValueChange={handleModelSelect}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select a model" />
+              </SelectTrigger>
+              <SelectContent>
+                {models.map((model) => (
+                  <SelectItem key={model} value={model}>
+                    {model}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-                <div
+          {/* Date Picker */}
+          <div>
+            <p className="text-sm font-medium mb-2">Date</p>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
                   className={cn(
-                    'relative transition-all duration-300 ease-in-out overflow-hidden',
-                    expandedItems[menu.item]
-                      ? 'max-h-96 opacity-100 visible z-10'
-                      : 'max-h-0 opacity-0 invisible -z-10'
+                    'w-full justify-start text-left font-normal',
+                    !selectedDate && 'text-muted-foreground'
                   )}
                 >
-                  {renderSubmenuContent(menu)}
-                </div>
-              </motion.div>
-            ))}
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {selectedDate ? (
+                    selectedDate.toLocaleDateString()
+                  ) : (
+                    <span>Pick a date</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0">
+                <Calendar
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={(date) => {
+                    setSelectedDate(date);
+                  }}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
 
-            {/* Selection Summary */}
-            {(selectedModel ||
-              selectedDate ||
-              selectedTimeRange ||
-              selectedMapMode) && (
-              <div className="border-t border-white/10">
-                {renderSelectionSummary()}
-              </div>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
+          {/* Map Mode Select */}
+          <div>
+            <p className="text-sm font-medium mb-2">Map Mode</p>
+            <Select value={selectedMapMode} onValueChange={handleMapModeChange}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select map mode" />
+              </SelectTrigger>
+              <SelectContent>
+                {mapModes.map((mode) => (
+                  <SelectItem key={mode} value={mode}>
+                    {mode}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Map Type Select */}
+          <div>
+            <p className="text-sm font-medium mb-2">Map Type</p>
+            <Select value={selectedMapType} onValueChange={setSelectedMapType}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select map type" />
+              </SelectTrigger>
+              <SelectContent>
+                {mapTypes.map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {type}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Location Selection Tabs */}
+          <div>
+            <p className="text-sm font-medium mb-2">Location Selection</p>
+            <Tabs
+              value={locationMode}
+              onValueChange={setLocationMode}
+              className="w-full"
+            >
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="gps" className="flex items-center gap-2">
+                  <MapPin size={16} />
+                  GPS
+                </TabsTrigger>
+                <TabsTrigger value="bbox" className="flex items-center gap-2">
+                  <Boxes size={16} />
+                  Bbox
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="gps">
+                <div className="mt-2 space-y-2">
+                  <div className="flex space-x-2">
+                    <input
+                      type="text"
+                      placeholder="Latitude"
+                      className="w-1/2 border rounded p-2 text-sm"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Longitude"
+                      className="w-1/2 border rounded p-2 text-sm"
+                    />
+                  </div>
+                </div>
+              </TabsContent>
+              <TabsContent value="bbox">
+                <div className="mt-2 space-y-2">
+                  <div className="flex space-x-2">
+                    <input
+                      type="text"
+                      placeholder="Min Lat"
+                      className="w-1/2 border rounded p-2 text-sm"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Max Lat"
+                      className="w-1/2 border rounded p-2 text-sm"
+                    />
+                  </div>
+                  <div className="flex space-x-2">
+                    <input
+                      type="text"
+                      placeholder="Min Lon"
+                      className="w-1/2 border rounded p-2 text-sm"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Max Lon"
+                      className="w-1/2 border rounded p-2 text-sm"
+                    />
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
