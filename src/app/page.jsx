@@ -1,99 +1,147 @@
 'use client';
+
 import 'leaflet/dist/leaflet.css';
-import { MapContainer, TileLayer } from 'react-leaflet';
-import { useEffect, useState } from 'react';
-import Navbar from '@/components/navbar';
-import SidePanel from '@/components/SidePanel';
-import CloudLayerManager from '@/components/CloudlLayerManager';
+import { useState, useRef } from 'react';
+import {
+  MapContainer,
+  TileLayer,
+  FeatureGroup,
+  Rectangle,
+} from 'react-leaflet';
+import BoundingBoxDrawer from '@/components/Boundingbox-drawer';
+import ContextMenu from '@/components/context-menu';
+import SelectedAreas from '@/components/selected-area';
+import TileLayerSelector from '@/components/tilelayer-selector';
+import CloudLayerManager from '@/components/cloudoverlay';
 
-export default function Map() {
-  const [cloudFrames, setCloudFrames] = useState([]);
-  const [cloudTimestamps, setCloudTimestamps] = useState([]);
-  const [host, setHost] = useState('');
-  const [isDynamic, setIsDynamic] = useState(false); // Toggle for static/dynamic map
+export default function Home() {
+  const [rectangles, setRectangles] = useState([]);
+  const [selectedRectangle, setSelectedRectangle] = useState(null);
+  const [contextMenu, setContextMenu] = useState({
+    visible: false,
+    x: 0,
+    y: 0,
+  });
+  const [isBoundingBoxMode, setIsBoundingBoxMode] = useState(false);
+  const [currentTileLayer, setCurrentTileLayer] = useState({
+    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+  });
+  const [showCloudLayer, setShowCloudLayer] = useState(true);
+  const mapRef = useRef(null);
 
-  // Fetch the RainViewer Weather Maps API
-  useEffect(() => {
-    const fetchWeatherMaps = async () => {
-      try {
-        const response = await fetch(
-          'https://api.rainviewer.com/public/weather-maps.json'
-        );
-        const data = await response.json();
-
-        setHost(data.host);
-        const frames = data.satellite.infrared.map((frame) => frame.path);
-        const timestamps = data.satellite.infrared.map((frame) => frame.time);
-
-        setCloudFrames(frames);
-        setCloudTimestamps(timestamps);
-
-        console.log('Retrieved Frames:', frames);
-        console.log(
-          'Retrieved Timestamps:',
-          timestamps.map((ts) => new Date(ts * 1000).toLocaleString())
-        );
-      } catch (error) {
-        console.error('Failed to fetch weather maps:', error);
-      }
-    };
-    fetchWeatherMaps();
-  }, []);
-
-  // State to manage the selected item and side panel visibility
-  const [selectedItem, setSelectedItem] = useState(null);
-  const [isSidePanelOpen, setIsSidePanelOpen] = useState(false);
-
-  // Handler for selecting an item
-  const handleItemSelect = (item) => {
-    setSelectedItem(item);
-    setIsSidePanelOpen(true);
+  const handleContextMenu = (e) => {
+    e.preventDefault();
+    setContextMenu({
+      visible: true,
+      x: e.clientX,
+      y: e.clientY,
+    });
   };
 
-  // Handler for toggling between static and dynamic maps
-  const toggleMapMode = () => setIsDynamic((prev) => !prev);
+  const closeContextMenu = () => {
+    setContextMenu({ visible: false, x: 0, y: 0 });
+  };
+
+  const handleAddRectangle = (bounds) => {
+    const newRectangle = {
+      bounds,
+      id: Date.now(),
+    };
+
+    setRectangles((prev) => [...prev, newRectangle]);
+    setSelectedRectangle(newRectangle);
+    setIsBoundingBoxMode(false);
+  };
+
+  const clearRectangles = () => {
+    setRectangles([]);
+    setSelectedRectangle(null);
+  };
+
+  const handleInterpolate = () => {
+    alert('Interpolate action triggered!');
+    closeContextMenu();
+  };
+
+  const handleBoundingBox = () => {
+    setIsBoundingBoxMode(true);
+    closeContextMenu();
+  };
+
+  const handleReload = () => {
+    window.location.reload();
+  };
+
+  const toggleCloudLayer = () => {
+    setShowCloudLayer(!showCloudLayer);
+    closeContextMenu();
+  };
 
   return (
-    <div className="relative h-screen flex">
-      <div className="flex-grow">
-        <MapContainer
-          center={[20.5937, 78.9629]} // Coordinates for center of India
-          zoom={5}
-          className="h-full w-full"
-          style={{ zIndex: 0 }}
-          attributionControl={false}
-        >
-          {/* Base map layer */}
-          <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" />
+    <div
+      className="absolute inset-0 select-none"
+      onContextMenu={handleContextMenu}
+      style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
+    >
+      <MapContainer
+        ref={mapRef}
+        center={[20.5937, 78.9629]}
+        zoom={5}
+        className="h-full w-full"
+        style={{
+          zIndex: 0,
+          height: '100%',
+          width: '100%',
+          position: 'absolute',
+        }}
+        attributionControl={false}
+      >
+        <TileLayer url={currentTileLayer.url} />
 
-          {/* Cloud Layers */}
-          {isDynamic && cloudFrames.length > 0 && (
-            <CloudLayerManager
-              frames={cloudFrames}
-              host={host}
-              timestamps={cloudTimestamps}
-            />
+        {showCloudLayer && <CloudLayerManager />}
+
+        <FeatureGroup>
+          {isBoundingBoxMode && (
+            <BoundingBoxDrawer onDrawComplete={handleAddRectangle} />
           )}
-          {!isDynamic && cloudFrames.length > 0 && (
-            <TileLayer
-              url={`${host}${cloudFrames[0]}/512/{z}/{x}/{y}/0/1_0.png`}
-              opacity={0.7}
+          {rectangles.map((rect) => (
+            <Rectangle
+              key={rect.id}
+              bounds={rect.bounds}
+              pathOptions={{
+                color: rect === selectedRectangle ? 'red' : 'blue',
+                fillColor: rect === selectedRectangle ? 'red' : 'blue',
+                fillOpacity: 0.3,
+              }}
             />
-          )}
-        </MapContainer>
-      </div>
-      <Navbar
-        onItemSelect={handleItemSelect}
-        toggleMapMode={toggleMapMode}
-        isDynamic={isDynamic}
+          ))}
+        </FeatureGroup>
+      </MapContainer>
+
+      <TileLayerSelector
+        onTileLayerChange={(layer) => setCurrentTileLayer(layer)}
       />
 
-      {/* Side Panel */}
-      <SidePanel
-        isOpen={isSidePanelOpen}
-        title={selectedItem?.name}
-        details={selectedItem?.details}
-        specifications={selectedItem?.specifications}
+      <SelectedAreas
+        rectangles={rectangles}
+        selectedRectangle={selectedRectangle}
+        setSelectedRectangle={setSelectedRectangle}
+        handleInterpolate={handleInterpolate}
+        clearRectangles={clearRectangles}
+      />
+
+      <ContextMenu
+        contextMenu={contextMenu}
+        onBoundingBox={handleBoundingBox}
+        onReload={handleReload}
+        onToggleCloudLayer={toggleCloudLayer}
+        showCloudLayer={showCloudLayer}
+        onCancelDrawing={() => {
+          setIsBoundingBoxMode(false);
+          mapRef.current?.dragging.enable();
+          closeContextMenu();
+        }}
+        closeContextMenu={closeContextMenu}
       />
     </div>
   );

@@ -1,14 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-body {
-  font-family: Lato, Arial, Helvetica, sans-serif;
-}
-
 @layer base {
   :root {
-    --radius: 0.5rem;
     --background: 0 0% 100%;
     --foreground: 0 0% 3.9%;
     --card: 0 0% 100%;
@@ -33,7 +27,16 @@ body {
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
-  }
+    --radius: 0.5rem
+  ;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%}
   .dark {
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
@@ -58,10 +61,17 @@ body {
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-  }
+    --chart-5: 340 75% 55%
+  ;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%}
 }
-
 @layer base {
   * {
     @apply border-border;
@@ -69,39 +79,4 @@ body {
   body {
     @apply bg-background text-foreground;
   }
-}
-
-/* Custom styles for date input */
-.date-input {
-  @apply px-3 py-2 border rounded-md bg-[#020617] text-white placeholder:text-neutral-400 outline-none focus:ring-2 focus:ring-neutral-600 focus:border-neutral-600;
-}
-
-/* Custom calendar icon */
-.date-input::-webkit-calendar-picker-indicator {
-  background-color: transparent; /* Make the calendar button blend with the input */
-  border: none;
-  padding: 5px;
-  color: white;
-  cursor: pointer;
-}
-
-/* Custom calendar pop-up (not fully customizable, but we can tweak this) */
-input[type='date']:focus::-webkit-datetime-edit {
-  background-color: #2d2d2d;
-  color: white;
-}
-
-input[type='date']:focus::-webkit-datetime-edit-year-field {
-  background-color: #2d2d2d;
-  color: white;
-}
-
-input[type='date']:focus::-webkit-datetime-edit-month-field {
-  background-color: #2d2d2d;
-  color: white;
-}
-
-input[type='date']:focus::-webkit-datetime-edit-day-field {
-  background-color: #2d2d2d;
-  color: white;
 }
