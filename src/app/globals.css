@@ -73,7 +73,7 @@ body {
 
 /* Custom styles for date input */
 .date-input {
-  @apply px-3 py-2 border rounded-md bg-neutral-800 text-white placeholder:text-neutral-400 outline-none focus:ring-2 focus:ring-neutral-600 focus:border-neutral-600;
+  @apply px-3 py-2 border rounded-md bg-[#020617] text-white placeholder:text-neutral-400 outline-none focus:ring-2 focus:ring-neutral-600 focus:border-neutral-600;
 }
 
 /* Custom calendar icon */
@@ -86,22 +86,22 @@ body {
 }
 
 /* Custom calendar pop-up (not fully customizable, but we can tweak this) */
-input[type="date"]:focus::-webkit-datetime-edit {
+input[type='date']:focus::-webkit-datetime-edit {
   background-color: #2d2d2d;
   color: white;
 }
 
-input[type="date"]:focus::-webkit-datetime-edit-year-field {
+input[type='date']:focus::-webkit-datetime-edit-year-field {
   background-color: #2d2d2d;
   color: white;
 }
 
-input[type="date"]:focus::-webkit-datetime-edit-month-field {
+input[type='date']:focus::-webkit-datetime-edit-month-field {
   background-color: #2d2d2d;
   color: white;
 }
 
-input[type="date"]:focus::-webkit-datetime-edit-day-field {
+input[type='date']:focus::-webkit-datetime-edit-day-field {
   background-color: #2d2d2d;
   color: white;
 }

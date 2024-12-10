@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Settings, ChevronDown, ChevronRight } from 'lucide-react';
+import {
+  Settings,
+  ChevronDown,
+  ChevronRight,
+  Calendar,
+  Clock,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import CustomDatePicker from './CustomDatePicker';
 import CustomTimePicker from './CustomTimePicker';
@@ -20,30 +26,36 @@ export default function Navbar({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTimeRange, setSelectedTimeRange] = useState(null);
+  const [selectedModel, setSelectedModel] = useState(null);
+  const [selectedMapMode, setSelectedMapMode] = useState('Static Map');
   const [expandedItems, setExpandedItems] = useState({});
 
   const menuItems = [
     {
       item: 'Model',
       options: ['DAIN', 'FILM', 'RIFE', 'RAFT'],
-      onSelect: (option) =>
-        onItemSelect({
+      onSelect: (option) => {
+        const modelDetails = {
           name: option,
           details: {
-            'Published By': getModelPublisher('RAFT'),
-            'Year Published': getModelYear('RAFT'),
+            'Published By': getModelPublisher(option),
+            'Year Published': getModelYear(option),
           },
           specifications: {
             Architecture: getModelArchitecture(option),
             'Primary Technique': getModelTechnique(option),
           },
-        }),
+        };
+        setSelectedModel(modelDetails);
+        onItemSelect(modelDetails);
+      },
     },
     {
       item: 'Date',
       component: CustomDatePicker,
       onSelect: (startDate, endDate) => {
-        setSelectedDate({ start: startDate, end: endDate });
+        const dateRange = { start: startDate, end: endDate };
+        setSelectedDate(dateRange);
         console.log('Selected Date Range:', startDate, endDate);
       },
     },
@@ -51,7 +63,8 @@ export default function Navbar({
       item: 'Time',
       component: CustomTimePicker,
       onSelect: (startTime, endTime) => {
-        setSelectedTimeRange({ start: startTime, end: endTime });
+        const timeRange = { start: startTime, end: endTime };
+        setSelectedTimeRange(timeRange);
         console.log('Selected Time Range:', startTime, endTime);
       },
     },
@@ -59,6 +72,7 @@ export default function Navbar({
       item: 'Map Mode',
       options: ['Static Map', 'Dynamic Map'],
       onSelect: (option) => {
+        setSelectedMapMode(option);
         if (
           (option === 'Static Map' && isDynamic) ||
           (option === 'Dynamic Map' && !isDynamic)
@@ -105,14 +119,14 @@ export default function Navbar({
     if (item.options && item.options.length > 0) {
       return (
         <motion.div
-          className="text-sm flex flex-col space-y-2 px-4 py-2 bg-neutral-800 text-white"
+          className="text-sm flex flex-col space-y-2 px-4 py-2 bg-[#1E293B] text-white"
           variants={menuVariants}
         >
           {item.options.map((option) => (
             <motion.div
               key={option}
               variants={itemVariants}
-              className="cursor-pointer p-2 hover:bg-neutral-700 rounded transition-colors text-white"
+              className="cursor-pointer p-2 hover:bg-[#020617] rounded transition-colors text-white"
               onClick={() => {
                 item.onSelect?.(option);
                 setIsMenuOpen(false);
@@ -144,10 +158,51 @@ export default function Navbar({
     return null;
   };
 
+  // Render selected items summary
+  const renderSelectionSummary = () => {
+    return (
+      <div className="px-4 py-2 bg-[#020617] space-y-1">
+        {selectedModel && (
+          <div className="flex items-center text-xs text-white">
+            <span className="mr-2">Model:</span>
+            <span className="font-semibold">{selectedModel.name}</span>
+          </div>
+        )}
+        {selectedDate && (
+          <div className="flex items-center text-xs text-white">
+            <Calendar size={12} className="mr-2" />
+            <span>
+              {selectedDate.start
+                ? selectedDate.start.toLocaleDateString()
+                : 'Start'}{' '}
+              -{' '}
+              {selectedDate.end ? selectedDate.end.toLocaleDateString() : 'End'}
+            </span>
+          </div>
+        )}
+        {selectedTimeRange && (
+          <div className="flex items-center text-xs text-white">
+            <Clock size={12} className="mr-2" />
+            <span>
+              {selectedTimeRange.start || 'Start'} -{' '}
+              {selectedTimeRange.end || 'End'}
+            </span>
+          </div>
+        )}
+        {selectedMapMode && (
+          <div className="flex items-center text-xs text-white">
+            <span className="mr-2">Map Mode:</span>
+            <span>{selectedMapMode}</span>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div
       className={cn(
-        'fixed top-2 left-2 z-50 bg-neutral-900 rounded-2xl shadow-lg w-64 max-h-[calc(100vh-2rem)] flex flex-col',
+        'fixed top-2 left-2 z-50 bg-[#1E293B] rounded-2xl shadow-lg w-64 max-h-[calc(100vh-2rem)] flex flex-col',
         className
       )}
     >
@@ -170,7 +225,7 @@ export default function Navbar({
             animate="visible"
             exit="hidden"
             variants={menuVariants}
-            className="bg-neutral-900 rounded-b-2xl overflow-y-auto flex-grow"
+            className="bg-[#1E293B] rounded-b-2xl overflow-y-auto flex-grow"
           >
             {menuItems.map((menu, index) => (
               <motion.div
@@ -179,7 +234,7 @@ export default function Navbar({
                 className="border-t border-white/10"
               >
                 <div
-                  className="flex justify-between items-center p-4 text-white cursor-pointer hover:bg-neutral-800 transition-colors"
+                  className="flex justify-between items-center p-4 text-white cursor-pointer hover:bg-[#020617] transition-colors"
                   onClick={() => toggleItemExpansion(menu.item)}
                 >
                   <span className="font-semibold">{menu.item}</span>
@@ -202,6 +257,16 @@ export default function Navbar({
                 </div>
               </motion.div>
             ))}
+
+            {/* Selection Summary */}
+            {(selectedModel ||
+              selectedDate ||
+              selectedTimeRange ||
+              selectedMapMode) && (
+              <div className="border-t border-white/10">
+                {renderSelectionSummary()}
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

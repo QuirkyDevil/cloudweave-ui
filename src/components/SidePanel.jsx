@@ -26,7 +26,7 @@ const SidePanel = ({
       <button
         onClick={() => setIsCollapsed(false)}
         className="fixed right-0 top-[100px] transform -translate-y-1/2 rotate-90 origin-top-right
-  bg-neutral-900 text-white p-2 rounded-b-lg
+  bg-[#1E293B] text-white p-2 rounded-b-lg
   shadow-lg flex items-center space-x-2 z-50
   hover:bg-neutral-00 transition-colors"
       >
@@ -51,7 +51,7 @@ const SidePanel = ({
         ${isOpen ? 'translate-x-0' : 'translate-x-full'}
         z-50
         overflow-y-auto
-        bg-neutral-900
+        bg-[#1E293B]
         text-white
         shadow-xl
         border-l border-neutral-800

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Calendar, ArrowRightLeft } from 'lucide-react';
 
 const CustomDatePicker = ({ onDateRangeSelect, className }) => {
   const [startDate, setStartDate] = useState(null);
@@ -77,7 +78,6 @@ const CustomDatePicker = ({ onDateRangeSelect, className }) => {
     return className;
   };
 
-  // Rest of the implementation remains the same as previous component...
   const selectDate = (date) => {
     if (!isValidDate(date)) return;
 
@@ -122,14 +122,23 @@ const CustomDatePicker = ({ onDateRangeSelect, className }) => {
 
   return (
     <div className={`w-full ${className}`}>
-      <div className="w-full bg-neutral-900 rounded-2xl p-2">
+      <div className="w-full bg-[#1E293B] rounded-2xl p-2">
         {/* Date Range Display */}
-        <div className="flex justify-between mb-2 text-white">
-          <div className="text-xs">
-            Start: {startDate ? formatDate(startDate) : 'Start Date'}
+        <div className="flex justify-between items-center mb-2 text-white">
+          <div className="flex items-center space-x-2">
+            <Calendar className="text-blue-400" size={16} />
+            <span className="text-xs">
+              {startDate ? formatDate(startDate) : 'Start Date'}
+            </span>
           </div>
-          <div className="text-xs">
-            End: {endDate ? formatDate(endDate) : 'End Date'}
+          {startDate && endDate && (
+            <ArrowRightLeft className="text-white/50" size={14} />
+          )}
+          <div className="flex items-center space-x-2">
+            <Calendar className="text-green-400" size={16} />
+            <span className="text-xs">
+              {endDate ? formatDate(endDate) : 'End Date'}
+            </span>
           </div>
         </div>
 
