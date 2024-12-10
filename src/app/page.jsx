@@ -10,13 +10,12 @@ import {
 } from 'react-leaflet';
 import BoundingBoxDrawer from '@/components/Boundingbox-drawer';
 import ContextMenu from '@/components/context-menu';
-import SelectedAreas from '@/components/selected-area';
+import SelectedArea from '@/components/selected-area';
 import TileLayerSelector from '@/components/tilelayer-selector';
 import CloudLayerManager from '@/components/cloudoverlay';
 
 export default function Home() {
-  const [rectangles, setRectangles] = useState([]);
-  const [selectedRectangle, setSelectedRectangle] = useState(null);
+  const [boundingBox, setBoundingBox] = useState(null);
   const [contextMenu, setContextMenu] = useState({
     visible: false,
     x: 0,
@@ -42,20 +41,13 @@ export default function Home() {
     setContextMenu({ visible: false, x: 0, y: 0 });
   };
 
-  const handleAddRectangle = (bounds) => {
-    const newRectangle = {
-      bounds,
-      id: Date.now(),
-    };
-
-    setRectangles((prev) => [...prev, newRectangle]);
-    setSelectedRectangle(newRectangle);
+  const handleAddBoundingBox = (bounds) => {
+    setBoundingBox(bounds);
     setIsBoundingBoxMode(false);
   };
 
-  const clearRectangles = () => {
-    setRectangles([]);
-    setSelectedRectangle(null);
+  const clearBoundingBox = () => {
+    setBoundingBox(null);
   };
 
   const handleInterpolate = () => {
@@ -102,19 +94,18 @@ export default function Home() {
 
         <FeatureGroup>
           {isBoundingBoxMode && (
-            <BoundingBoxDrawer onDrawComplete={handleAddRectangle} />
+            <BoundingBoxDrawer onDrawComplete={handleAddBoundingBox} />
           )}
-          {rectangles.map((rect) => (
+          {boundingBox && (
             <Rectangle
-              key={rect.id}
-              bounds={rect.bounds}
+              bounds={boundingBox}
               pathOptions={{
-                color: rect === selectedRectangle ? 'red' : 'blue',
-                fillColor: rect === selectedRectangle ? 'red' : 'blue',
+                color: 'red',
+                fillColor: 'red',
                 fillOpacity: 0.3,
               }}
             />
-          ))}
+          )}
         </FeatureGroup>
       </MapContainer>
 
@@ -122,12 +113,10 @@ export default function Home() {
         onTileLayerChange={(layer) => setCurrentTileLayer(layer)}
       />
 
-      <SelectedAreas
-        rectangles={rectangles}
-        selectedRectangle={selectedRectangle}
-        setSelectedRectangle={setSelectedRectangle}
+      <SelectedArea
+        boundingBox={boundingBox}
         handleInterpolate={handleInterpolate}
-        clearRectangles={clearRectangles}
+        clearBoundingBox={clearBoundingBox}
       />
 
       <ContextMenu
