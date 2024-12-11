@@ -14,6 +14,7 @@ export default function SelectedArea({
   boundingBox,
   handleInterpolate,
   clearBoundingBox,
+
 }) {
   // If boundingBox is an array, create an object with methods to mimic Leaflet's bounds interface
   const getBounds = () => {

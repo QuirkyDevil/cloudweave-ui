@@ -12,7 +12,7 @@ import {
 } from 'react-leaflet';
 import CloudLayerManager from '@/components/cloudoverlay';
 import BoundingBoxDrawer from '@/components/boundingBox-drawer';
-
+import { toast } from 'sonner';
 
 export default function MapComponent({
   currentTileLayer,
@@ -60,7 +60,7 @@ export default function MapComponent({
       });
       hls.on(Hls.Events.ERROR, function (event, data) {
         setVideoLoading(false);
-        console.error('Error', event, data);
+        toast.error('Failed to load video');
       });
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
       video.src = videoSrc;
@@ -72,6 +72,8 @@ export default function MapComponent({
       ref={mapRef}
       center={[20.5937, 78.9629]}
       zoom={5}
+      minZoom={3}
+      zoomAnimation={true}
       zoomControl={false}
       className="h-full w-full"
       style={{

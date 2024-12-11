@@ -1,7 +1,8 @@
+'use client';
+
 import { useState } from 'react';
-import { format } from 'date-fns';
-import { Clock, Calendar as CalendarIcon, Play, Pause } from 'lucide-react';
-import { toast } from 'sonner';
+import { addDays, format, subDays } from 'date-fns';
+import { CalendarIcon, Play, Pause } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
@@ -12,7 +13,8 @@ import {
 } from '@/components/ui/popover';
 import { Card } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { TimePopover } from './ui/TimePopOver';
+import { toast } from 'sonner';
 
 export function TimelineMediaPlayer({
   onPlayPauseChange,
@@ -20,11 +22,63 @@ export function TimelineMediaPlayer({
   onTimelineChange,
   timelineValue,
 }) {
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
+  const currentYear = new Date().getFullYear();
+  const [date, setDate] = useState({
+    from: subDays(new Date(), 7),
+    to: new Date(),
+  });
   const [startTime, setStartTime] = useState('00:00');
   const [endTime, setEndTime] = useState('00:00');
   const [isPlaying, setIsPlaying] = useState(false);
+
+  const createDateTimeString = (selectedDate, time) => {
+    if (!selectedDate) return '';
+    const formattedDate = format(selectedDate, 'yyyy-MM-dd');
+    return `${formattedDate}T${time}:00.000Z`;
+  };
+
+  const isDateInFuture = (selectedDate, selectedTime) => {
+    const selectedDateTime = new Date(
+      createDateTimeString(selectedDate, selectedTime)
+    );
+    const now = new Date();
+    return selectedDateTime > now;
+  };
+
+  const handleDateRangeChange = (dateInfo = {}) => {
+    const effectiveStartDate = dateInfo.from || date?.from;
+    const effectiveEndDate = dateInfo.to || date?.to;
+    const effectiveStartTime = dateInfo.startTime || startTime;
+    const effectiveEndTime = dateInfo.endTime || endTime;
+
+    // Check if the selected date/time is in the future
+    if (
+      isDateInFuture(effectiveStartDate, effectiveStartTime) ||
+      isDateInFuture(effectiveEndDate, effectiveEndTime)
+    ) {
+      toast.error("Can't select future date/time");
+      setDate({
+        from: subDays(new Date(), 7),
+        to: new Date(),
+      });
+      return;
+    }
+
+    // Create date-time strings
+    const startDateString = createDateTimeString(
+      effectiveStartDate,
+      effectiveStartTime
+    );
+    const endDateString = createDateTimeString(
+      effectiveEndDate,
+      effectiveEndTime
+    );
+
+    onDateRangeChange?.({
+      startDate: startDateString,
+      endDate: endDateString,
+    });
+  };
 
   const handlePlayPauseToggle = () => {
     const newPlayingState = !isPlaying;
@@ -33,239 +87,111 @@ export function TimelineMediaPlayer({
     toast.info(newPlayingState ? 'Playing' : 'Paused');
   };
 
-  const handleStartDateChange = (date) => {
-    setStartDate(date);
-    onDateRangeChange?.({
-      startDate: date,
-      startTime,
-      endDate,
-      endTime,
-    });
-  };
-
-  const handleEndDateChange = (date) => {
-    setEndDate(date);
-    onDateRangeChange?.({
-      startDate,
-      startTime,
-      endDate: date,
-      endTime,
-    });
-  };
-
-  const TimePopover = ({ time, onTimeChange, label }) => {
-    const [selectedHour, setSelectedHour] = useState(time.split(':')[0]);
-    const [selectedMinute, setSelectedMinute] = useState(time.split(':')[1]);
-
-    const hours = Array.from({ length: 24 }, (_, i) =>
-      i.toString().padStart(2, '0')
-    );
-
-    const handleConfirm = () => {
-      const newTime = `${selectedHour}:${selectedMinute}`;
-      onTimeChange(newTime);
-    };
-
-    return (
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button
-            variant={'outline'}
-            className="flex items-center space-x-1 w-[100px] justify-center"
-          >
-            <Clock className="h-4 w-4 mr-1" />
-            {time}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-[320px] p-4 space-y-4">
-          <div className="flex justify-between items-center">
-            <h4 className="text-lg font-semibold">Select Time</h4>
-            <div className="flex items-center space-x-2">
-              <div className="bg-muted rounded-md p-1 text-center w-16">
-                {selectedHour}
-              </div>
-              <span>:</span>
-              <div className="bg-muted rounded-md p-1 text-center w-16">
-                {selectedMinute}
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <h5 className="text-sm font-medium mb-2">Hours</h5>
-              <ScrollArea className="h-48 w-full border rounded-md">
-                <div className="p-2 space-y-1">
-                  {hours.map((hour) => (
-                    <Button
-                      key={hour}
-                      variant={selectedHour === hour ? 'default' : 'ghost'}
-                      size="sm"
-                      onClick={() => setSelectedHour(hour)}
-                      className={cn(
-                        'w-full mb-1',
-                        selectedHour === hour &&
-                          'bg-[#42BCFF] text-white hover:from-[#42BCFF] hover:to-[#5C3FFD]'
-                      )}
-                    >
-                      {hour}
-                    </Button>
-                  ))}
-                </div>
-              </ScrollArea>
+  return (
+    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-2xl px-4">
+      <Card className="w-full">
+        <div className="p-4 space-y-4">
+          <div className="flex items-center justify-around gap-8">
+            <div className="flex flex-col items-center">
+              <span className="text-sm text-muted-foreground pb-1">
+                Start Time
+              </span>
+              <TimePopover
+                time={startTime}
+                onTimeChange={(newTime) => {
+                  setStartTime(newTime);
+                  handleDateRangeChange({
+                    startTime: newTime,
+                  });
+                }}
+                label="Start"
+              />
             </div>
 
-            <div>
-              <h5 className="text-sm font-medium mb-2">Minutes</h5>
-              <div className="grid grid-cols-1 gap-2 border rounded-md p-2">
-                {['00', '30'].map((minute) => (
+            <div className="flex flex-col items-center flex-grow">
+              <span className="text-sm text-muted-foreground pb-1">
+                Select Date Range
+              </span>
+              <Popover>
+                <PopoverTrigger asChild>
                   <Button
-                    key={minute}
-                    variant={selectedMinute === minute ? 'default' : 'ghost'}
-                    size="sm"
-                    onClick={() => setSelectedMinute(minute)}
+                    variant={'outline'}
                     className={cn(
-                      'w-full',
-                      selectedMinute === minute &&
-                        'bg-[#42BCFF] text-white hover:from-[#42BCFF] hover:to-[#5C3FFD]'
+                      'w-[300px] justify-start text-left font-normal',
+                      !date && 'text-muted-foreground'
                     )}
                   >
-                    {minute}
+                    <CalendarIcon />
+                    {date?.from ? (
+                      date.to ? (
+                        <>
+                          {format(date.from, 'LLL dd, y')} -{' '}
+                          {format(date.to, 'LLL dd, y')}
+                        </>
+                      ) : (
+                        format(date.from, 'LLL dd, y')
+                      )
+                    ) : (
+                      <span>Pick a date</span>
+                    )}
                   </Button>
-                ))}
-              </div>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0 min-h-full" align="start">
+                  <Calendar
+                    initialFocus
+                    mode="range"
+                    defaultMonth={date?.from}
+                    selected={date}
+                    onSelect={(selectedDate) => {
+                      setDate(selectedDate);
+                      handleDateRangeChange(selectedDate);
+                    }}
+                    minDate={new Date('2000-01-01')}
+                    numberOfMonths={1}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            <div className="flex flex-col items-center">
+              <span className="text-sm text-muted-foreground pb-1">
+                End Time
+              </span>
+              <TimePopover
+                time={endTime}
+                onTimeChange={(newTime) => {
+                  setEndTime(newTime);
+                  handleDateRangeChange({
+                    endTime: newTime,
+                  });
+                }}
+                label="End"
+              />
             </div>
           </div>
-
-          <div className="flex justify-end space-x-2">
-            <Button
-              variant="outline"
-              onClick={() => {
-                setSelectedHour(time.split(':')[0]);
-                setSelectedMinute(time.split(':')[1]);
-              }}
-            >
-              Cancel
-            </Button>
-            <Button
-              className={cn('bg-[#42BCFF] text-white hover:from-[#42BCFF] hover:to-[#5C3FFD]')}
-              onClick={handleConfirm}
-            >
-              Confirm
-            </Button>
-          </div>
-        </PopoverContent>
-      </Popover>
-    );
-  };
-
-  const handleStartTimeChange = (newTime) => {
-    setStartTime(newTime);
-    onDateRangeChange?.({
-      startDate,
-      startTime: newTime,
-      endDate,
-      endTime,
-    });
-  };
-
-  const handleEndTimeChange = (newTime) => {
-    setEndTime(newTime);
-    onDateRangeChange?.({
-      startDate,
-      startTime,
-      endDate,
-      endTime: newTime,
-    });
-  };
-
-  return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-xl px-4">
-      <Card className="w-full">
-        <div className="p-3 space-y-2">
-          <div className="flex items-center space-x-2 flex-wrap justify-center gap-2">
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant={'outline'}
-                  className={cn(
-                    'flex-1 min-w-[120px] justify-center text-center font-normal',
-                    !startDate && 'text-muted-foreground'
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {startDate ? format(startDate, 'PP') : 'Start'}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={startDate}
-                  onSelect={handleStartDateChange}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-
-            <TimePopover
-              time={startTime}
-              onTimeChange={handleStartTimeChange}
-              label="Start"
-            />
-
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant={'outline'}
-                  className={cn(
-                    'flex-1 min-w-[120px] justify-center text-center font-normal',
-                    !endDate && 'text-muted-foreground'
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {endDate ? format(endDate, 'PP') : 'End'}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={endDate}
-                  onSelect={handleEndDateChange}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-
-            <TimePopover
-              time={endTime}
-              onTimeChange={handleEndTimeChange}
-              label="End"
-            />
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              size="icon"
-              className="shrink-0"
-              onClick={handlePlayPauseToggle}
-            >
-              {isPlaying ? (
-                <Pause className="h-4 w-4" />
-              ) : (
-                <Play className="h-4 w-4" />
-              )}
-            </Button>
-            <Slider
-              value={[timelineValue]}
-              onValueChange={(value) => {
-                onTimelineChange(value[0])
-              }}
-              max={100}
-              step={1}
-              className="flex-grow"
-            />
-          </div>
+            <div className="flex items-center justify-center space-x-4 mt-4">
+              <Button
+                variant="outline"
+                size="icon"
+                className="shrink-0"
+                onClick={handlePlayPauseToggle}
+              >
+                {isPlaying ? (
+                  <Pause className="h-4 w-4" />
+                ) : (
+                  <Play className="h-4 w-4" />
+                )}
+              </Button>
+              <Slider
+                value={[timelineValue]}
+                onValueChange={(value) => {
+                  onTimelineChange(value[0]);
+                }}
+                max={100}
+                step={1}
+                className="flex-grow"
+              />
+            </div>
         </div>
       </Card>
     </div>

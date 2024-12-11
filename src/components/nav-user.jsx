@@ -1,18 +1,12 @@
-"use client"
-
 import {
   ChevronsUpDown,
   LogOut,
   History,
   Sun,
   Moon,
-  Monitor
-} from "lucide-react"
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar"
+  Monitor,
+} from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,12 +22,19 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/components/ui/sidebar"
-import { useTheme } from "next-themes";
+} from '@/components/ui/sidebar';
+import { useTheme } from 'next-themes';
+import { useClerk } from '@clerk/nextjs';
 
-export function NavUser({user}) {
-  const { isMobile } = useSidebar()
+
+export function NavUser({ user }) {
+  const { isMobile } = useSidebar();
   const { theme, setTheme } = useTheme();
+  const { signOut } = useClerk();
+
+  const handleSignOut = () => {
+    signOut();
+  };
 
   return (
     <SidebarMenu>
@@ -105,7 +106,9 @@ export function NavUser({user}) {
                 History
               </DropdownMenuItem>
             </DropdownMenuGroup>
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleSignOut}>
+              {' '}
+              {/* Handle sign-out click */}
               <LogOut />
               Log out
             </DropdownMenuItem>
