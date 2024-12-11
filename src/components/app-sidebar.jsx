@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/sidebar';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
+import { toast } from 'sonner';
 import { CustomSiderBarHeader } from '@/components/sidebar-headers';
 
 const data = {
@@ -57,6 +58,11 @@ export function AppSidebar({ ...props }) {
   const [selectedItems, setSelectedItems] = useState({});
 
   const handleSelectSubItem = (groupId, subItemId) => {
+    if (selectedItems[groupId] === subItemId) {
+      toast.info(`You have already selected ${subItemId}`);
+      return;
+    }
+    toast.success(`Selected ${subItemId} in ${groupId}`);
     setSelectedItems((prev) => ({
       ...prev,
       [groupId]: subItemId,

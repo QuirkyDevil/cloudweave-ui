@@ -1,18 +1,11 @@
 'use client';
 
-import 'leaflet/dist/leaflet.css';
-import { useState, useRef } from 'react';
-import {
-  MapContainer,
-  TileLayer,
-  FeatureGroup,
-  Rectangle,
-} from 'react-leaflet';
-import BoundingBoxDrawer from '@/components/Boundingbox-drawer';
+import { useState } from 'react';
+import { toast } from 'sonner';
+import MapComponent from '@/components/map-component';
 import ContextMenu from '@/components/context-menu';
 import SelectedArea from '@/components/selected-area';
 import TileLayerSelector from '@/components/tilelayer-selector';
-import CloudLayerManager from '@/components/cloudoverlay';
 
 export default function Home() {
   const [boundingBox, setBoundingBox] = useState(null);
@@ -26,7 +19,6 @@ export default function Home() {
     url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
   });
   const [showCloudLayer, setShowCloudLayer] = useState(true);
-  const mapRef = useRef(null);
 
   const handleContextMenu = (e) => {
     e.preventDefault();
@@ -44,18 +36,32 @@ export default function Home() {
   const handleAddBoundingBox = (bounds) => {
     setBoundingBox(bounds);
     setIsBoundingBoxMode(false);
+    console.log('Bounding box added:', bounds);
   };
 
   const clearBoundingBox = () => {
+    toast.success('Bounding box cleared');
     setBoundingBox(null);
   };
 
   const handleInterpolate = () => {
-    alert('Interpolate action triggered!');
+    toast.promise(
+      new Promise((resolve) => {
+        setTimeout(() => {
+          resolve();
+        }, 1000);
+      }),
+      {
+        loading: 'Interpolating...',
+        success: 'Interpolated successfully',
+        error: 'Failed to interpolate',
+      }
+    );
     closeContextMenu();
   };
 
   const handleBoundingBox = () => {
+    toast.info('Draw a bounding box on the map to select an area');
     setIsBoundingBoxMode(true);
     closeContextMenu();
   };
@@ -65,6 +71,7 @@ export default function Home() {
   };
 
   const toggleCloudLayer = () => {
+    toast.success('Cloud layer toggled ' + (showCloudLayer ? 'off' : 'on'));
     setShowCloudLayer(!showCloudLayer);
     closeContextMenu();
   };
@@ -75,39 +82,13 @@ export default function Home() {
       onContextMenu={handleContextMenu}
       style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
     >
-      <MapContainer
-        ref={mapRef}
-        center={[20.5937, 78.9629]}
-        zoom={5}
-        className="h-full w-full"
-        style={{
-          zIndex: 0,
-          height: '100%',
-          width: '100%',
-          position: 'absolute',
-        }}
-        attributionControl={false}
-      >
-        <TileLayer url={currentTileLayer.url} />
-
-        {showCloudLayer && <CloudLayerManager />}
-
-        <FeatureGroup>
-          {isBoundingBoxMode && (
-            <BoundingBoxDrawer onDrawComplete={handleAddBoundingBox} />
-          )}
-          {boundingBox && (
-            <Rectangle
-              bounds={boundingBox}
-              pathOptions={{
-                color: 'red',
-                fillColor: 'red',
-                fillOpacity: 0.3,
-              }}
-            />
-          )}
-        </FeatureGroup>
-      </MapContainer>
+      <MapComponent
+        currentTileLayer={currentTileLayer}
+        showCloudLayer={showCloudLayer}
+        boundingBox={boundingBox}
+        isBoundingBoxMode={isBoundingBoxMode}
+        onAddBoundingBox={handleAddBoundingBox}
+      />
 
       <TileLayerSelector
         onTileLayerChange={(layer) => setCurrentTileLayer(layer)}
@@ -127,7 +108,6 @@ export default function Home() {
         showCloudLayer={showCloudLayer}
         onCancelDrawing={() => {
           setIsBoundingBoxMode(false);
-          mapRef.current?.dragging.enable();
           closeContextMenu();
         }}
         closeContextMenu={closeContextMenu}

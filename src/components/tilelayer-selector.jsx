@@ -34,7 +34,7 @@ const TileLayerSelector = ({ onTileLayerChange }) => {
   };
 
   return (
-    <div className="absolute bottom-4 right-4 z-[1000] flex items-end">
+    <div className="absolute top-4 right-4 z-[1000] flex items-end">
       {/* Stacked cards */}
       <div
         className={`

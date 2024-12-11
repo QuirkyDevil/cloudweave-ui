@@ -2,6 +2,7 @@ import { Lato } from 'next/font/google';
 import { cookies } from 'next/headers';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/app-sidebar';
+import { Toaster } from '@/components/ui/sonner';
 import './globals.css';
 
 const lato = Lato({
@@ -23,8 +24,9 @@ export default async function RootLayout({ children }) {
         <SidebarProvider defaultOpen={defaultOpen}>
           <div className="flex h-full w-full">
             <AppSidebar />
-            <SidebarTrigger/>
+            <SidebarTrigger />
             <main className="flex-grow h-full">{children}</main>
+            <Toaster />
           </div>
         </SidebarProvider>
       </body>

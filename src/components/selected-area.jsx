@@ -7,6 +7,22 @@ export default function SelectedArea({
   handleInterpolate,
   clearBoundingBox,
 }) {
+  // If boundingBox is an array, create an object with methods to mimic Leaflet's bounds interface
+  const getBounds = () => {
+    if (!boundingBox) return null;
+
+    return {
+      getNorthEast: () => ({
+        lat: boundingBox[1][0],
+        lng: boundingBox[1][1]
+      }),
+      getSouthWest: () => ({
+        lat: boundingBox[0][0],
+        lng: boundingBox[0][1]
+      })
+    };
+  };
+
   return (
     boundingBox && (
       <div className="absolute top-4 right-4 z-[1000] bg-white p-4 rounded-lg shadow-lg border border-gray-200">
@@ -17,11 +33,11 @@ export default function SelectedArea({
         <div className="space-y-2">
           <div className="p-2 rounded-lg border bg-blue-100 border-blue-300 text-sm">
             <div className="text-xs text-gray-500">
-              NE: {boundingBox.getNorthEast().lat.toFixed(4)},{' '}
-              {boundingBox.getNorthEast().lng.toFixed(4)}
+              NE: {getBounds().getNorthEast().lat.toFixed(4)},{' '}
+              {getBounds().getNorthEast().lng.toFixed(4)}
               <br />
-              SW: {boundingBox.getSouthWest().lat.toFixed(4)},{' '}
-              {boundingBox.getSouthWest().lng.toFixed(4)}
+              SW: {getBounds().getSouthWest().lat.toFixed(4)},{' '}
+              {getBounds().getSouthWest().lng.toFixed(4)}
             </div>
           </div>
         </div>

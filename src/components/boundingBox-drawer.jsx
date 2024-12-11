@@ -28,7 +28,7 @@ export default function BoundingBoxDrawer({ onDrawComplete }) {
         onDrawComplete(bounds);
         setStartPoint(null);
         setEndPoint(null);
-        map.dragging.enable(); // Re-enable dragging after drawing
+        map.dragging.enable();
       }
     },
   });

@@ -8,7 +8,6 @@ export default function ContextMenu({
   onBoundingBox,
   onReload,
   onCancelDrawing,
-  closeContextMenu,
   onToggleCloudLayer,
   showCloudLayer,
 }) {
@@ -59,7 +58,7 @@ export default function ContextMenu({
           className="px-3 py-2 hover:bg-gray-100 cursor-pointer rounded flex items-center text-sm text-red-600"
         >
           <XSquare className="mr-2 w-4 h-4" />
-          Cancel Drawing
+          Cancel Action
         </div>
         <div className="border-t my-1 border-gray-200"></div>
         <div className="px-3 py-2 text-xs text-gray-500 flex items-center">

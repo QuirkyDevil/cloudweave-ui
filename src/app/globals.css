@@ -1,6 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.video{
+  max-width: unset;
+  max-height: unset;
+}
 @layer base {
   :root {
     --background: 0 0% 100%;

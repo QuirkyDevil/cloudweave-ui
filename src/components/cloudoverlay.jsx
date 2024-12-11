@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { TileLayer } from 'react-leaflet';
+import { toast } from 'sonner';
 
 const CloudLayerManager = ({ initialOpacity = 0.5 }) => {
   const [cloudFrame, setCloudFrame] = useState('');
@@ -17,9 +18,10 @@ const CloudLayerManager = ({ initialOpacity = 0.5 }) => {
         setHost(data.host);
         setCloudFrame(firstFrame);
       } catch (error) {
-        console.error('Failed to fetch weather maps:', error);
+        toast.error('Failed to fetch weather maps');
       }
     };
+
 
     fetchWeatherMaps();
   }, []);
