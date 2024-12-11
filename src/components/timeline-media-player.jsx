@@ -18,13 +18,13 @@ export function TimelineMediaPlayer({
   onPlayPauseChange,
   onDateRangeChange,
   onTimelineChange,
+  timelineValue,
 }) {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [startTime, setStartTime] = useState('00:00');
   const [endTime, setEndTime] = useState('00:00');
   const [isPlaying, setIsPlaying] = useState(false);
-  const [timelineValue, setTimelineValue] = useState([0]);
 
   const handlePlayPauseToggle = () => {
     const newPlayingState = !isPlaying;
@@ -179,11 +179,6 @@ export function TimelineMediaPlayer({
     });
   };
 
-  const handleTimelineChange = (value) => {
-    setTimelineValue(value);
-    onTimelineChange?.(value[0]);
-  };
-
   return (
     <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-xl px-4">
       <Card className="w-full">
@@ -262,8 +257,10 @@ export function TimelineMediaPlayer({
               )}
             </Button>
             <Slider
-              value={timelineValue}
-              onValueChange={handleTimelineChange}
+              value={[timelineValue]}
+              onValueChange={(value) => {
+                onTimelineChange(value[0])
+              }}
               max={100}
               step={1}
               className="flex-grow"

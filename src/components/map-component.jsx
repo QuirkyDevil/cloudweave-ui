@@ -11,7 +11,7 @@ import {
   VideoOverlay,
 } from 'react-leaflet';
 import CloudLayerManager from '@/components/cloudoverlay';
-import BoundingBoxDrawer from '@/components/Boundingbox-drawer';
+import BoundingBoxDrawer from '@/components/boundingBox-drawer';
 
 
 export default function MapComponent({
