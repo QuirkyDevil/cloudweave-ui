@@ -10,6 +10,7 @@ import {
   Rectangle,
   VideoOverlay,
 } from 'react-leaflet';
+import { toast } from 'sonner';
 import CloudLayerManager from '@/components/cloudoverlay';
 import BoundingBoxDrawer from '@/components/Boundingbox-drawer';
 
@@ -23,7 +24,6 @@ export default function MapComponent({
 }) {
   const [videoUrl, setVideoUrl] = useState('');
   const [videoRef, setVideoRef] = useState(null);
-  const [videoLoading, setVideoLoading] = useState(false);
   const mapRef = useRef(null);
   const nativeVideoRef = useRef(null);
 
@@ -62,19 +62,25 @@ export default function MapComponent({
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
         setVideoLoading(false);
         video.play().catch((error) => {
-          console.error('Error playing video:', error);
+          toast.message('Error playing video',
+           { description: error.message}
+          );
         });
       });
 
       hls.on(Hls.Events.ERROR, (event, data) => {
         setVideoLoading(false);
-        console.error('HLS Error', event, data);
+        toast.message('Error loading video',{
+          description: data,
+        }
+        );
 
         // Fallback to native playback if HLS fails
         if (video.canPlayType('application/vnd.apple.mpegurl')) {
           video.src = videoUrl;
           video.play().catch((error) => {
-            console.error('Error playing fallback video:', error);
+           toast.message('Error playing native video',{description: error.message}
+          );
           });
         }
       });
