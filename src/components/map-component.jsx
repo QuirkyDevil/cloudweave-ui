@@ -72,6 +72,7 @@ export default function MapComponent({
       ref={mapRef}
       center={[20.5937, 78.9629]}
       zoom={5}
+      zoomControl={false}
       className="h-full w-full"
       style={{
         zIndex: 0,
