@@ -10,7 +10,6 @@ import {
   Rectangle,
   VideoOverlay,
 } from 'react-leaflet';
-import { toast } from 'sonner';
 import CloudLayerManager from '@/components/cloudoverlay';
 import BoundingBoxDrawer from '@/components/Boundingbox-drawer';
 
@@ -24,8 +23,9 @@ export default function MapComponent({
 }) {
   const [videoUrl, setVideoUrl] = useState('');
   const [videoRef, setVideoRef] = useState(null);
+  const [videoLoading, setVideoLoading] = useState(false);
+
   const mapRef = useRef(null);
-  const nativeVideoRef = useRef(null);
 
   const convertBounds = (bounds) => {
     if (!bounds) return null;
@@ -39,62 +39,33 @@ export default function MapComponent({
     const convertedBounds = convertBounds(bounds);
     onAddBoundingBox(convertedBounds);
 
-    // Set video URL when bounding box is added
     const videoSrc = 'https://cdn.jwplayer.com/manifests/pZxWPRg4.m3u8';
     setVideoUrl(videoSrc);
   };
 
   useEffect(() => {
-    if (!videoUrl) return;
-
     setVideoLoading(true);
-    const video = nativeVideoRef.current;
+    let video = videoRef?.getElement();
     if (!video) return;
 
+    let videoSrc = 'https://cdn.jwplayer.com/manifests/pZxWPRg4.m3u8';
+
     if (Hls.isSupported()) {
-      const hls = new Hls({
-        debug: true, // Enable debug logging
-      });
-
-      hls.loadSource(videoUrl);
+      let hls = new Hls();
+      hls.loadSource(videoSrc);
       hls.attachMedia(video);
-
-      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+      hls.on(Hls.Events.MANIFEST_PARSED, function () {
         setVideoLoading(false);
-        video.play().catch((error) => {
-          toast.message('Error playing video',
-           { description: error.message}
-          );
-        });
+        video.play();
       });
-
-      hls.on(Hls.Events.ERROR, (event, data) => {
+      hls.on(Hls.Events.ERROR, function (event, data) {
         setVideoLoading(false);
-        toast.message('Error loading video',{
-          description: data,
-        }
-        );
-
-        // Fallback to native playback if HLS fails
-        if (video.canPlayType('application/vnd.apple.mpegurl')) {
-          video.src = videoUrl;
-          video.play().catch((error) => {
-           toast.message('Error playing native video',{description: error.message}
-          );
-          });
-        }
+        console.error('Error', event, data);
       });
-
-      return () => {
-        hls.destroy();
-      };
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-      video.src = videoUrl;
-      video.play().catch((error) => {
-        console.error('Error playing native video:', error);
-      });
+      video.src = videoSrc;
     }
-  }, [videoUrl]);
+  }, [videoRef]);
 
   return (
     <MapContainer
@@ -123,9 +94,10 @@ export default function MapComponent({
             <Rectangle
               bounds={boundingBox}
               pathOptions={{
-                color: 'red',
-                fillColor: 'red',
-                fillOpacity: 0.3,
+                color: 'black',
+                weight: 1,
+                fillColor: 'black',
+                fillOpacity: 0.1,
               }}
             />
 
@@ -136,22 +108,7 @@ export default function MapComponent({
               zIndex={1000}
               play={true}
               ref={setVideoRef}
-            >
-              <video
-                ref={nativeVideoRef}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                }}
-                autoPlay
-                loop
-                muted
-              />
-            </VideoOverlay>
+            />
           </>
         )}
       </FeatureGroup>

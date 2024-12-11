@@ -2,9 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-.video{
+video{
   max-width: unset;
-  max-height: unset;
 }
 @layer base {
   :root {

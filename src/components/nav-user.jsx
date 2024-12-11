@@ -3,9 +3,11 @@
 import {
   ChevronsUpDown,
   LogOut,
-  History
+  History,
+  Sun,
+  Moon,
+  Monitor
 } from "lucide-react"
-
 import {
   Avatar,
   AvatarFallback,
@@ -19,16 +21,19 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+  DropdownMenuRadioGroup,
+} from '@/components/ui/dropdown-menu';
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { useTheme } from "next-themes";
 
 export function NavUser({user}) {
   const { isMobile } = useSidebar()
+  const { theme, setTheme } = useTheme();
 
   return (
     <SidebarMenu>
@@ -52,7 +57,7 @@ export function NavUser({user}) {
           </DropdownMenuTrigger>
           <DropdownMenuContent
             className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-            side={isMobile ? "bottom" : "right"}
+            side={isMobile ? 'bottom' : 'right'}
             align="end"
             sideOffset={4}
           >
@@ -75,6 +80,31 @@ export function NavUser({user}) {
                 History
               </DropdownMenuItem>
             </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>Appearance</DropdownMenuLabel>
+              <DropdownMenuRadioGroup value={theme} onValueChange={setTheme}>
+                <DropdownMenuItem onSelect={() => setTheme('light')}>
+                  <Sun className="mr-2 h-4 w-4" />
+                  Light Mode
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setTheme('dark')}>
+                  <Moon className="mr-2 h-4 w-4" />
+                  Dark Mode
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setTheme('system')}>
+                  <Monitor className="mr-2 h-4 w-4" />
+                  System Default
+                </DropdownMenuItem>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem>
+                <History />
+                History
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
             <DropdownMenuItem>
               <LogOut />
               Log out
@@ -83,5 +113,5 @@ export function NavUser({user}) {
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
-  )
+  );
 }

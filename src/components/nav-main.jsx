@@ -29,7 +29,7 @@ export function NavMain({ items, selectedItems, onSelectSubItem }) {
                       onClick={() => onSelectSubItem(item.groupId, subItem.id)}
                       className={
                         selectedItems[item.groupId] === subItem.id
-                          ? 'bg-gradient-to-r from-[#42BCFF] to-[#5C3FFD] text-white'
+                          ? 'bg-[#42BCFF]  text-white'
                           : ''
                       }
                     >

@@ -225,12 +225,10 @@ const SidebarTrigger = React.forwardRef(
       <Button
         ref={ref}
         data-sidebar="trigger"
-        variant="ghost"
+        variant="secondary"
         size="icon"
         className={cn(
-          'h-10 w-10 z-10 -ml-2 mt-2', // Increased size from h-7 w-7 to h-10 w-10
-          'bg-white hover:bg-white', // Ensure white background at all times
-          'border border-gray-200 shadow-sm', // Optional: add subtle border and shadow for definition
+          'h-10 w-10 z-10 ml-2 mt-2',
           className
         )}
         onClick={(event) => {

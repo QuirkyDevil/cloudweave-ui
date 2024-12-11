@@ -16,7 +16,7 @@ import { CustomSiderBarHeader } from '@/components/sidebar-headers';
 const data = {
   user: {
     name: 'CloudWeave',
-    email: 'hello@cloudweave.com',
+    email: 'example@cloudweave.com',
     avatar: '/vercel.svg',
   },
   navMain: [
@@ -70,7 +70,7 @@ export function AppSidebar({ ...props }) {
   };
 
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
         <CustomSiderBarHeader teams={data.teams} />
       </SidebarHeader>
