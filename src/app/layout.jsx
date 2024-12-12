@@ -11,6 +11,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { AppSidebar } from '@/components/app-sidebar';
 import { Toaster } from '@/components/ui/sonner';
 import './globals.css';
+import Navbar from '@/components/navbar-cp';
 
 const lato = Lato({
   subsets: ['latin'],
@@ -37,14 +38,11 @@ export default async function RootLayout({ children }) {
               enableSystem
               disableTransitionOnChange
             >
-              <SidebarProvider defaultOpen={defaultOpen}>
-                <div className="flex h-full w-full">
-                  <AppSidebar />
-                  <SidebarTrigger />
-                  <main className="flex-grow h-full">{children}</main>
-                  <Toaster />
-                </div>
-              </SidebarProvider>
+              <div className="flex h-full w-full">
+                <Navbar />
+                <main className="flex-grow h-full">{children}</main>
+                <Toaster />
+              </div>
             </ThemeProvider>
           </SignedIn>
           <SignedOut>
