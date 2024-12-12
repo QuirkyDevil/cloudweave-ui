@@ -19,19 +19,12 @@ export default function Navbar({ className, }) {
   return (
     <div
       className={cn(
-        'fixed top-2 left-2 z-50 bg-[#0a0a0a] border rounded-2xl shadow-lg w-72',
+        'fixed top-2 left-2 z-50 bg-[#0a0a0a] border rounded-2xl shadow-lg',
         className
       )}
     >
       <div className="flex items-center justify-between p-4">
         <Image alt='logo' src="/logo_long.png" width={320} height={960} className='h-8 w-auto' />
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setIsPopoverOpen(!isPopoverOpen)}
-        >
-          <Settings size={32} />
-        </Button>
       </div>
 
       {isPopoverOpen && (
@@ -42,14 +35,9 @@ export default function Navbar({ className, }) {
               onValueChange={setLocationMode}
               className="w-full"
             >
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="gps" className="flex items-center gap-2">
+              <TabsList className="flex w-full">
+                <TabsTrigger value="gps" className="flex items-center gap-2 w-full">
                   <MapPin size={16} />
-                  GPS
-                </TabsTrigger>
-                <TabsTrigger value="bbox" className="flex items-center gap-2">
-                  <Boxes size={16} />
-                  Bbox
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="gps">
