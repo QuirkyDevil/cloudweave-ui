@@ -9,10 +9,12 @@ import {
   FeatureGroup,
   Rectangle,
   VideoOverlay,
+  SVGOverlay,
 } from 'react-leaflet';
 import CloudLayerManager from '@/components/cloudoverlay';
 import BoundingBoxDrawer from '@/components/boundingBox-drawer';
 import { toast } from 'sonner';
+import Loader from './loader';
 
 export default function MapComponent({
   currentTileLayer,
@@ -20,9 +22,8 @@ export default function MapComponent({
   boundingBox,
   isBoundingBoxMode,
   onAddBoundingBox,
-  handleTimeUpdate,
+  isLoading,
 }) {
-  const [videoUrl, setVideoUrl] = useState('');
   const [videoRef, setVideoRef] = useState(null);
   const [videoLoading, setVideoLoading] = useState(false);
 
@@ -39,35 +40,27 @@ export default function MapComponent({
   const handleAddBoundingBox = (bounds) => {
     const convertedBounds = convertBounds(bounds);
     onAddBoundingBox(convertedBounds);
-
-    const videoSrc = 'https://cdn.jwplayer.com/manifests/pZxWPRg4.m3u8';
-    setVideoUrl(videoSrc);
   };
 
-  useEffect(() => {
-    handleTimeUpdate();
-    setVideoLoading(true);
-    let video = videoRef?.getElement();
-    if (!video) return;
+  function halfBound(bounds) {
+    const [[x1, y1], [x2, y2]] = bounds;
 
-    let videoSrc = 'https://cdn.jwplayer.com/manifests/pZxWPRg4.m3u8';
+    const centerX = (x1 + x2) / 2;
+    const centerY = (y1 + y2) / 2;
 
-    if (Hls.isSupported()) {
-      let hls = new Hls();
-      hls.loadSource(videoSrc);
-      hls.attachMedia(video);
-      hls.on(Hls.Events.MANIFEST_PARSED, function () {
-        setVideoLoading(false);
-        video.play();
-      });
-      hls.on(Hls.Events.ERROR, function (event, data) {
-        setVideoLoading(false);
-        toast.error('Failed to load video');
-      });
-    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-      video.src = videoSrc;
-    }
-  }, [videoRef]);
+    const halfWidth = (x2 - x1) / 4;
+    const halfHeight = (y2 - y1) / 4;
+
+    const newX1 = centerX - halfWidth;
+    const newY1 = centerY - halfHeight;
+    const newX2 = centerX + halfWidth;
+    const newY2 = centerY + halfHeight;
+
+    return [
+      [newX1, newY1],
+      [newX2, newY2],
+    ];
+  }
 
   return (
     <MapContainer
@@ -94,7 +87,16 @@ export default function MapComponent({
         {isBoundingBoxMode && (
           <BoundingBoxDrawer onDrawComplete={handleAddBoundingBox} />
         )}
-        {boundingBox && videoUrl && (
+        {isLoading && (
+          <SVGOverlay
+            bounds={halfBound(boundingBox)}
+            key={boundingBox.toString() + "-loading"}
+            opacity={0.9}
+          >
+            {<Loader />}
+          </SVGOverlay>
+        )}
+        {boundingBox && (
           <>
             <Rectangle
               bounds={boundingBox}
@@ -108,7 +110,7 @@ export default function MapComponent({
 
             <VideoOverlay
               bounds={boundingBox}
-              url={videoUrl}
+              url={""}
               key={JSON.stringify(boundingBox)}
               zIndex={1000}
               play={true}
