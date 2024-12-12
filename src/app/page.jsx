@@ -13,7 +13,7 @@ export default function Home() {
   const [currentTileLayer, setCurrentTileLayer] = useState({
     url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
   });
-  const [showCloudLayer, setShowCloudLayer] = useState(true);
+  const [showCloudLayer, setShowCloudLayer] = useState(false);
 
   const [boundingBox, setBoundingBox] = useState(null);
   const [isBoundingBoxMode, setIsBoundingBoxMode] = useState(false);

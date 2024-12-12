@@ -56,9 +56,7 @@ export default function TileLayerSelector({ onTileLayerChange }) {
 
   // Determine default layer based on system theme
   const getDefaultLayer = () => {
-    return resolvedTheme === 'dark'
-      ? TILE_LAYERS.find((layer) => layer.name === 'Dark Mode')
-      : TILE_LAYERS[0];
+    return TILE_LAYERS[3];
   };
 
   const [selectedLayer, setSelectedLayer] = useState(
