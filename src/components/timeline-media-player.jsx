@@ -87,8 +87,6 @@ export function TimelineMediaPlayer({
     toast.info(newPlayingState ? "Playing" : "Paused");
   };
 
-  const video = window.document.querySelector("video");
-
   return (
     <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-2xl px-4">
       <Card className="w-full">
@@ -187,6 +185,7 @@ export function TimelineMediaPlayer({
             <Slider
               value={[timelineValue]}
               onValueChange={(value) => {
+                const video = window.document.querySelector("video");
                 if (!video) return;
                 if (video.paused) {
                   onTimelineChange(value[0]);

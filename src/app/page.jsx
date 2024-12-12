@@ -87,6 +87,12 @@ export default function Home() {
 
   const handleTimelineChange = (value) => {
     setTimelineValue(value);
+
+    const video = window.document.querySelector('video');
+    if (!video) return;
+    const duration = video.duration;
+    const currentTime = (value / 100) * duration;
+    video.currentTime = currentTime;
   };
 
   function handleTimeUpdate() {
@@ -100,21 +106,6 @@ export default function Home() {
       setTimelineValue(percentage);
     });
   }
-
-  useEffect(() => {
-    const video = window.document.querySelector('video');
-    if (!video) return;
-
-    console.log(video)
-    console.log(video.duration)
-
-    const duration = video.duration;
-    const seekTime = (duration * timelineValue) / 100;
-
-    console.log(seekTime);
-
-    video.currentTime = seekTime;
-  }, [timelineValue]);
 
   return (
     <MapContextMenu
