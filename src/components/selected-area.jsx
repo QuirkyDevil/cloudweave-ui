@@ -71,7 +71,7 @@ export default function SelectedArea({
             <div className="space-y-2">
               <Button
                 onClick={handleInterpolate}
-                className="w-full bg-gradient-to-r from-[#42BCFF] to-[#5C3FFD] text-white"
+                className="w-full bg-gradient-to-r from-[#42BCFF] to-[#5C3FFD] text-white flex justify-start"
                 variant="default"
               >
                 <MoveDiagonal className="mr-2 w-4 h-4" />
@@ -79,7 +79,7 @@ export default function SelectedArea({
               </Button>
               <Button
                 onClick={clearBoundingBox}
-                className="w-full"
+                className="w-full flex justify-start"
                 variant="destructive"
               >
                 <Trash2 className="mr-2 w-4 h-4" />

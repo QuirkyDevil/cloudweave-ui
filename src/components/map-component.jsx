@@ -22,10 +22,10 @@ export default function MapComponent({
   boundingBox,
   isBoundingBoxMode,
   onAddBoundingBox,
+  handleTimeUpdate,
   isLoading,
 }) {
   const [videoRef, setVideoRef] = useState(null);
-  const [videoLoading, setVideoLoading] = useState(false);
 
   const mapRef = useRef(null);
 
@@ -36,6 +36,10 @@ export default function MapComponent({
       [bounds._northEast.lat, bounds._northEast.lng],
     ];
   };
+
+  useEffect(() => {
+    handleTimeUpdate();
+  }, [videoRef]);
 
   const handleAddBoundingBox = (bounds) => {
     const convertedBounds = convertBounds(bounds);

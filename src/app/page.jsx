@@ -53,8 +53,8 @@ export default function Home() {
       bbox: `${boundingBox[0][1]},${boundingBox[0][0]},${boundingBox[1][1]},${boundingBox[1][0]}`,
       width: video.offsetWidth,
       height: video.offsetHeight,
-      start_time: "2019-05-14T00:15:00.000Z",
-      end_time: "2019-05-14T04:15:00.000Z",
+      start_time: "2019-05-14T02:15:00.000Z",
+      end_time: "2019-05-14T06:15:00.000Z",
       time_step: 30,
     };
 

@@ -6,9 +6,7 @@ import {
   SignedOut,
   RedirectToSignIn,
 } from '@clerk/nextjs';
-import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { ThemeProvider } from '@/components/theme-provider';
-import { AppSidebar } from '@/components/app-sidebar';
 import { Toaster } from '@/components/ui/sonner';
 import './globals.css';
 import Navbar from '@/components/navbar-cp';

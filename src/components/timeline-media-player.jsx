@@ -24,11 +24,11 @@ export function TimelineMediaPlayer({
 }) {
   const currentYear = new Date().getFullYear();
   const [date, setDate] = useState({
-    from: subDays(new Date(), 7),
-    to: new Date(),
+    from: new Date("2019-05-14T02:15:00.000Z"),
+    to: new Date("2019-05-14T06:15:00.000Z"),
   });
-  const [startTime, setStartTime] = useState("00:00");
-  const [endTime, setEndTime] = useState("00:00");
+  const [startTime, setStartTime] = useState("02:15");
+  const [endTime, setEndTime] = useState("06:15");
   const [isPlaying, setIsPlaying] = useState(false);
 
   const createDateTimeString = (selectedDate, time) => {
@@ -177,6 +177,7 @@ export function TimelineMediaPlayer({
               value={[timelineValue]}
               onValueChange={(value) => {
                 const video = window.document.querySelector("video");
+                console.log(video, video.paused)
                 if (!video) return;
                 if (video.paused) {
                   onTimelineChange(value[0]);
