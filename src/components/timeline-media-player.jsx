@@ -1,20 +1,20 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { addDays, format, subDays } from 'date-fns';
-import { CalendarIcon, Play, Pause } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
+import { useState } from "react";
+import { addDays, format, subDays } from "date-fns";
+import { CalendarIcon, Play, Pause } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover';
-import { Card } from '@/components/ui/card';
-import { Slider } from '@/components/ui/slider';
-import { TimePopover } from './ui/TimePopOver';
-import { toast } from 'sonner';
+} from "@/components/ui/popover";
+import { Card } from "@/components/ui/card";
+import { Slider } from "@/components/ui/slider";
+import { TimePopover } from "./ui/TimePopOver";
+import { toast } from "sonner";
 
 export function TimelineMediaPlayer({
   onPlayPauseChange,
@@ -27,19 +27,19 @@ export function TimelineMediaPlayer({
     from: subDays(new Date(), 7),
     to: new Date(),
   });
-  const [startTime, setStartTime] = useState('00:00');
-  const [endTime, setEndTime] = useState('00:00');
+  const [startTime, setStartTime] = useState("00:00");
+  const [endTime, setEndTime] = useState("00:00");
   const [isPlaying, setIsPlaying] = useState(false);
 
   const createDateTimeString = (selectedDate, time) => {
-    if (!selectedDate) return '';
-    const formattedDate = format(selectedDate, 'yyyy-MM-dd');
+    if (!selectedDate) return "";
+    const formattedDate = format(selectedDate, "yyyy-MM-dd");
     return `${formattedDate}T${time}:00.000Z`;
   };
 
   const isDateInFuture = (selectedDate, selectedTime) => {
     const selectedDateTime = new Date(
-      createDateTimeString(selectedDate, selectedTime)
+      createDateTimeString(selectedDate, selectedTime),
     );
     const now = new Date();
     return selectedDateTime > now;
@@ -67,11 +67,11 @@ export function TimelineMediaPlayer({
     // Create date-time strings
     const startDateString = createDateTimeString(
       effectiveStartDate,
-      effectiveStartTime
+      effectiveStartTime,
     );
     const endDateString = createDateTimeString(
       effectiveEndDate,
-      effectiveEndTime
+      effectiveEndTime,
     );
 
     onDateRangeChange?.({
@@ -84,8 +84,10 @@ export function TimelineMediaPlayer({
     const newPlayingState = !isPlaying;
     setIsPlaying(newPlayingState);
     onPlayPauseChange?.(newPlayingState);
-    toast.info(newPlayingState ? 'Playing' : 'Paused');
+    toast.info(newPlayingState ? "Playing" : "Paused");
   };
+
+  const video = window.document.querySelector("video");
 
   return (
     <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-2xl px-4">
@@ -115,21 +117,21 @@ export function TimelineMediaPlayer({
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
-                    variant={'outline'}
+                    variant={"outline"}
                     className={cn(
-                      'w-[300px] justify-start text-left font-normal',
-                      !date && 'text-muted-foreground'
+                      "w-[300px] justify-start text-left font-normal",
+                      !date && "text-muted-foreground",
                     )}
                   >
                     <CalendarIcon />
                     {date?.from ? (
                       date.to ? (
                         <>
-                          {format(date.from, 'LLL dd, y')} -{' '}
-                          {format(date.to, 'LLL dd, y')}
+                          {format(date.from, "LLL dd, y")} -{" "}
+                          {format(date.to, "LLL dd, y")}
                         </>
                       ) : (
-                        format(date.from, 'LLL dd, y')
+                        format(date.from, "LLL dd, y")
                       )
                     ) : (
                       <span>Pick a date</span>
@@ -146,7 +148,7 @@ export function TimelineMediaPlayer({
                       setDate(selectedDate);
                       handleDateRangeChange(selectedDate);
                     }}
-                    minDate={new Date('2000-01-01')}
+                    minDate={new Date("2000-01-01")}
                     numberOfMonths={1}
                   />
                 </PopoverContent>
@@ -169,29 +171,32 @@ export function TimelineMediaPlayer({
               />
             </div>
           </div>
-            <div className="flex items-center justify-center space-x-4 mt-4">
-              <Button
-                variant="outline"
-                size="icon"
-                className="shrink-0"
-                onClick={handlePlayPauseToggle}
-              >
-                {isPlaying ? (
-                  <Pause className="h-4 w-4" />
-                ) : (
-                  <Play className="h-4 w-4" />
-                )}
-              </Button>
-              <Slider
-                value={[timelineValue]}
-                onValueChange={(value) => {
+          <div className="flex items-center justify-center space-x-4 mt-4">
+            <Button
+              variant="outline"
+              size="icon"
+              className="shrink-0"
+              onClick={handlePlayPauseToggle}
+            >
+              {isPlaying ? (
+                <Pause className="h-4 w-4" />
+              ) : (
+                <Play className="h-4 w-4" />
+              )}
+            </Button>
+            <Slider
+              value={[timelineValue]}
+              onValueChange={(value) => {
+                if (!video) return;
+                if (video.paused) {
                   onTimelineChange(value[0]);
-                }}
-                max={100}
-                step={1}
-                className="flex-grow"
-              />
-            </div>
+                }
+              }}
+              max={100}
+              step={1}
+              className="flex-grow"
+            />
+          </div>
         </div>
       </Card>
     </div>

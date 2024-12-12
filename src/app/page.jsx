@@ -89,7 +89,7 @@ export default function Home() {
     setTimelineValue(value);
   };
 
-  useEffect(() => {
+  function handleTimeUpdate() {
     const video = window.document.querySelector('video');
     if (!video) return;
 
@@ -99,14 +99,19 @@ export default function Home() {
       const percentage = (currentTime / duration) * 100;
       setTimelineValue(percentage);
     });
-  }, [timelineValue]);
+  }
 
   useEffect(() => {
     const video = window.document.querySelector('video');
     if (!video) return;
 
+    console.log(video)
+    console.log(video.duration)
+
     const duration = video.duration;
     const seekTime = (duration * timelineValue) / 100;
+
+    console.log(seekTime);
 
     video.currentTime = seekTime;
   }, [timelineValue]);
@@ -130,6 +135,7 @@ export default function Home() {
           isBoundingBoxMode={isBoundingBoxMode}
           onAddBoundingBox={handleAddBoundingBox}
           onVideoLoaded={handleVideoLoaded}
+          handleTimeUpdate={handleTimeUpdate}
         />
 
         <TileLayerSelector

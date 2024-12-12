@@ -20,6 +20,7 @@ export default function MapComponent({
   boundingBox,
   isBoundingBoxMode,
   onAddBoundingBox,
+  handleTimeUpdate,
 }) {
   const [videoUrl, setVideoUrl] = useState('');
   const [videoRef, setVideoRef] = useState(null);
@@ -44,6 +45,7 @@ export default function MapComponent({
   };
 
   useEffect(() => {
+    handleTimeUpdate();
     setVideoLoading(true);
     let video = videoRef?.getElement();
     if (!video) return;
