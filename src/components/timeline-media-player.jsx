@@ -88,14 +88,11 @@ export function TimelineMediaPlayer({
   };
 
   return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-2xl px-4">
+    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-xl px-4">
       <Card className="w-full">
         <div className="p-4 space-y-4">
-          <div className="flex items-center justify-around gap-8">
+          <div className="flex items-center justify-around gap-2">
             <div className="flex flex-col items-center">
-              <span className="text-sm text-muted-foreground pb-1">
-                Start Time
-              </span>
               <TimePopover
                 time={startTime}
                 onTimeChange={(newTime) => {
@@ -109,15 +106,12 @@ export function TimelineMediaPlayer({
             </div>
 
             <div className="flex flex-col items-center flex-grow">
-              <span className="text-sm text-muted-foreground pb-1">
-                Select Date Range
-              </span>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant={"outline"}
                     className={cn(
-                      "w-[300px] justify-start text-left font-normal",
+                      "justify-start text-center font-normal",
                       !date && "text-muted-foreground",
                     )}
                   >
@@ -154,9 +148,6 @@ export function TimelineMediaPlayer({
             </div>
 
             <div className="flex flex-col items-center">
-              <span className="text-sm text-muted-foreground pb-1">
-                End Time
-              </span>
               <TimePopover
                 time={endTime}
                 onTimeChange={(newTime) => {

@@ -1,23 +1,23 @@
 export default function Loader() {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 150">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
       <path
-        fill="none"
-        stroke="#5F9EA0"
-        strokeWidth="12"
-        strokeLinecap="round"
-        strokeDasharray="300 385"
-        strokeDashoffset="0"
-        d="M275 75c0 31-27 50-50 50-58 0-92-100-150-100-28 0-50 22-50 50s23 50 50 50c58 0 92-100 150-100 24 0 50 19 50 50Z"
+        fill="#212734"
+        stroke="#212734"
+        stroke-width="15"
+        transform-origin="center"
+        d="m148 84.7 13.8-8-10-17.3-13.8 8a50 50 0 0 0-27.4-15.9v-16h-20v16A50 50 0 0 0 63 67.4l-13.8-8-10 17.3 13.8 8a50 50 0 0 0 0 31.7l-13.8 8 10 17.3 13.8-8a50 50 0 0 0 27.5 15.9v16h20v-16a50 50 0 0 0 27.4-15.9l13.8 8 10-17.3-13.8-8a50 50 0 0 0 0-31.7Zm-47.5 50.8a35 35 0 1 1 0-70 35 35 0 0 1 0 70Z"
       >
-        <animate
-          attributeName="stroke-dashoffset"
+        <animateTransform
+          type="rotate"
+          attributeName="transform"
           calcMode="spline"
           dur="2"
-          values="685;-685"
+          values="0;120"
+          keyTimes="0;1"
           keySplines="0 0 1 1"
           repeatCount="indefinite"
-        ></animate>
+        ></animateTransform>
       </path>
     </svg>
   );
