@@ -48,17 +48,6 @@ export default function MapContextMenu({
           <XSquare className="mr-2 w-4 h-4" />
           Cancel Action
         </ContextMenuItem>
-        <ContextMenuSeparator />
-        <ContextMenuSub>
-          <ContextMenuSubTrigger>
-            <Map className="mr-2 w-4 h-4" />
-            Map Actions
-          </ContextMenuSubTrigger>
-          <ContextMenuSubContent>
-            <ContextMenuItem>Download Video</ContextMenuItem>
-            <ContextMenuItem>Share Location</ContextMenuItem>
-          </ContextMenuSubContent>
-        </ContextMenuSub>
       </ContextMenuContent>
     </ContextMenu>
   );
